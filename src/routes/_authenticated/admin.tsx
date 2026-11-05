@@ -36,6 +36,11 @@ function Admin() {
   const [form, setForm] = useState(empty);
   const [pf, setPf] = useState(emptyPkg);
   const { data: PACKAGES = [] } = usePackages(true);
+  const [pq, setPq] = useState("");
+  const [pstat, setPstat] = useState<"all" | "on" | "off">("all");
+  const shownPkgs = PACKAGES.filter((k) =>
+    k.label.toLowerCase().includes(pq.trim().toLowerCase()) &&
+    (pstat === "all" || (pstat === "on" ? k.active : !k.active)));
 
   const channels = useQuery({ queryKey: ["channels"], queryFn: async () => (await supabase.from("channels").select("*").order("sort_order")).data ?? [] });
   const payments = useQuery({ queryKey: ["allPayments"], enabled: isAdmin, queryFn: async () => (await supabase.from("payments").select("*").order("created_at", { ascending: false })).data ?? [] });
@@ -178,7 +183,16 @@ function Admin() {
 
         <TabsContent value="packages" className="mt-4 grid gap-6 lg:grid-cols-[1fr_380px]">
           <div className="space-y-2">
-            {PACKAGES.map((k) => (
+            <div className="flex flex-wrap gap-2">
+              <Input className="flex-1" value={pq} onChange={(e) => setPq(e.target.value)} placeholder="Tafuta huduma kwa jina…" />
+              <select className="h-9 rounded-md border border-input bg-background px-3 text-sm" value={pstat} onChange={(e) => setPstat(e.target.value as typeof pstat)}>
+                <option value="all">Zote</option>
+                <option value="on">Zimewashwa</option>
+                <option value="off">Zimezimwa</option>
+              </select>
+            </div>
+            {shownPkgs.length === 0 && <p className="p-4 text-center text-sm text-muted-foreground">Hakuna huduma iliyopatikana.</p>}
+            {shownPkgs.map((k) => (
               <div key={k.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold">{k.label} · <span className="text-primary">{formatTsh(k.price)}</span> <span className="text-xs text-muted-foreground">· Siku {k.days}{k.active ? "" : " · IMEZIMWA"}</span></div>

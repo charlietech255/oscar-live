@@ -8,3 +8,5 @@
 - [x] Admin: create/edit packages (services) themselves
 - [x] Admin: service form (name, description, price, on/off)
 - [x] Service form validation + clear save messages
+- [x] Admin package search + on/off filter
+- [x] Player auto-recovers streams + retry button
