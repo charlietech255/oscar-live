@@ -15,3 +15,4 @@
 - [x] Rename free channel to "OSCAR" + put a football video on it (auto-looping)
 - [x] AI: viewer describes match/channel, AI finds matching channels
 - [x] Each service (package) has a picture/logo
+- [x] Player: visible sound + fullscreen buttons

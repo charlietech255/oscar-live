@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Volume2, VolumeX, Maximize } from "lucide-react";
 
 export function HlsPlayer({ src }: { src: string }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [muted, setMuted] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
 
   // Jaribu kucheza; kama kivinjari kikizuia sauti, anzisha kimyagiza kisha mtumiaji afanye unmute
   const tryPlay = (video: HTMLVideoElement) => {
@@ -64,8 +67,48 @@ export function HlsPlayer({ src }: { src: string }) {
   }, [src, attempt]);
 
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-card">
-      <video ref={ref} controls playsInline autoPlay muted={false} className="h-full w-full" />
+    <div ref={boxRef} className="relative aspect-video w-full overflow-hidden rounded-xl bg-card">
+      <video
+        ref={ref}
+        controls
+        playsInline
+        autoPlay
+        muted={false}
+        className="h-full w-full"
+        onVolumeChange={(e) => setMuted(e.currentTarget.muted || e.currentTarget.volume === 0)}
+        onPlay={(e) => setMuted(e.currentTarget.muted)}
+      />
+      <div className="absolute right-2 top-2 flex gap-2">
+        <Button
+          size="sm"
+          variant="secondary"
+          aria-label={muted ? "Washa sauti" : "Zima sauti"}
+          onClick={() => {
+            const v = ref.current;
+            if (!v) return;
+            v.muted = !v.muted;
+            if (!v.muted && v.volume === 0) v.volume = 1;
+          }}
+        >
+          {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          <span className="ml-1">{muted ? "Washa sauti" : "Sauti"}</span>
+        </Button>
+        <Button
+          size="sm"
+          variant="secondary"
+          aria-label="Skrini nzima"
+          onClick={() => {
+            const v = ref.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
+            const box = boxRef.current;
+            if (document.fullscreenElement) return void document.exitFullscreen();
+            if (box?.requestFullscreen) box.requestFullscreen().catch(() => v?.webkitEnterFullscreen?.());
+            else v?.webkitEnterFullscreen?.();
+          }}
+        >
+          <Maximize className="h-4 w-4" />
+          <span className="ml-1">Skrini nzima</span>
+        </Button>
+      </div>
       {error && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/90 p-4 text-center text-muted-foreground">
           <p>Mtiririko huu haupatikani kwa sasa.</p>
