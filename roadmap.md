@@ -11,3 +11,4 @@
 - [x] Admin package search + on/off filter
 - [x] Player auto-recovers streams + retry button
 - [x] Admin can delete services (packages)
+- [x] Rename "Kasigara Live (Bure)" channel to "Oska"
