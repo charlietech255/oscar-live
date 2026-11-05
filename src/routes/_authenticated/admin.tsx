@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 const empty = { id: "", name: "", category: "Michezo", stream_url: "", logo_url: "", description: "", is_live: true, is_premium: true, sort_order: 0 };
-const emptyPkg = { id: "", label: "", price: 1000, days: 1, description: "", active: true, sort_order: 0 };
+const emptyPkg = { id: "", label: "", price: 1000, days: 1, description: "", image_url: "", active: true, sort_order: 0 };
 
 function Admin() {
   const { isAdmin, user } = useAuth();
@@ -99,7 +99,7 @@ function Admin() {
     const { id, ...row } = pf;
     const problem = validatePackage(row);
     if (problem) { toast.error(problem); return; }
-    const payload = { ...row, label: row.label.trim(), description: row.description.trim() || null };
+    const payload = { ...row, label: row.label.trim(), description: row.description.trim() || null, image_url: row.image_url.trim() || null };
     const { error } = id
       ? await supabase.from("packages").update(payload).eq("id", id)
       : await supabase.from("packages").insert({ ...payload, id: row.label.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Math.random().toString(36).slice(2, 6) });
@@ -251,11 +251,12 @@ function Admin() {
             {shownPkgs.length === 0 && <p className="p-4 text-center text-sm text-muted-foreground">Hakuna huduma iliyopatikana.</p>}
             {shownPkgs.map((k) => (
               <div key={k.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                {k.image_url && <img src={k.image_url} alt="" className="h-10 w-10 rounded object-cover" />}
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold">{k.label} · <span className="text-primary">{formatTsh(k.price)}</span> <span className="text-xs text-muted-foreground">· Siku {k.days}{k.active ? "" : " · IMEZIMWA"}</span></div>
                   {k.description && <div className="text-xs text-muted-foreground">{k.description}</div>}
                 </div>
-                <Button size="icon" variant="ghost" onClick={() => setPf({ ...emptyPkg, ...k, description: k.description ?? "" })}><Pencil className="h-4 w-4" /></Button>
+                <Button size="icon" variant="ghost" onClick={() => setPf({ ...emptyPkg, ...k, description: k.description ?? "", image_url: k.image_url ?? "" })}><Pencil className="h-4 w-4" /></Button>
                 <Button size="icon" variant="ghost" aria-label="Futa huduma" onClick={() => removePkg(k.id, k.label)}><Trash2 className="h-4 w-4" /></Button>
               </div>
             ))}
@@ -266,6 +267,7 @@ function Admin() {
             <div className="space-y-1"><Label>Bei (TSh)</Label><Input type="number" min={1} required value={pf.price} onChange={(e) => setPf({ ...pf, price: Number(e.target.value) })} /></div>
             <div className="space-y-1"><Label>Idadi ya siku</Label><Input type="number" min={1} required value={pf.days} onChange={(e) => setPf({ ...pf, days: Number(e.target.value) })} /></div>
             <div className="space-y-1"><Label>Maelezo</Label><Input value={pf.description} onChange={(e) => setPf({ ...pf, description: e.target.value })} /></div>
+            <div className="space-y-1"><Label>Picha / nembo (linki ya picha)</Label><Input value={pf.image_url} placeholder="https://..." onChange={(e) => setPf({ ...pf, image_url: e.target.value })} /></div>
             <div className="space-y-1"><Label>Mpangilio</Label><Input type="number" value={pf.sort_order} onChange={(e) => setPf({ ...pf, sort_order: Number(e.target.value) })} /></div>
             <div className="flex items-center gap-2"><Switch checked={pf.active} onCheckedChange={(v) => setPf({ ...pf, active: v })} /><Label>Kinaonekana kwa wateja</Label></div>
             <div className="flex gap-2">

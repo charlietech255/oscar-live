@@ -60,6 +60,7 @@ export type Database = {
           days: number
           description: string | null
           id: string
+          image_url: string | null
           label: string
           price: number
           sort_order: number
@@ -70,6 +71,7 @@ export type Database = {
           days: number
           description?: string | null
           id: string
+          image_url?: string | null
           label: string
           price: number
           sort_order?: number
@@ -80,6 +82,7 @@ export type Database = {
           days?: number
           description?: string | null
           id?: string
+          image_url?: string | null
           label?: string
           price?: number
           sort_order?: number

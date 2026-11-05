@@ -72,6 +72,7 @@ function Packages() {
             onClick={() => setPkg(p.id)}
             className={cn("rounded-2xl border bg-card p-5 text-left transition-all", pkg === p.id ? "border-primary ring-2 ring-primary" : "border-border hover:border-muted-foreground")}
           >
+            {p.image_url && <img src={p.image_url} alt={p.label} loading="lazy" className="mb-3 h-16 w-16 rounded-lg object-cover" />}
             <div className="font-display text-3xl">{p.label}</div>
             <div className="mt-2 text-2xl font-bold text-primary">{formatTsh(p.price)}</div>
             <div className="mt-2 text-sm text-muted-foreground">{p.description || `Chaneli zote · Siku ${p.days}`}</div>
