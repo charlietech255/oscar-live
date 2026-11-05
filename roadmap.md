@@ -12,3 +12,4 @@
 - [x] Player auto-recovers streams + retry button
 - [x] Admin can delete services (packages)
 - [x] Rename "Kasigara Live (Bure)" channel to "Oska"
+- [ ] Rename free channel to "OSCAR" + put a football video on it (auto-looping)

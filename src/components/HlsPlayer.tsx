@@ -6,6 +6,14 @@ export function HlsPlayer({ src }: { src: string }) {
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
+  // Jaribu kucheza; kama kivinjari kikizuia sauti, anzisha kimyagiza kisha mtumiaji afanye unmute
+  const tryPlay = (video: HTMLVideoElement) => {
+    video.play().catch(() => {
+      video.muted = true;
+      video.play().catch(() => {});
+    });
+  };
+
   useEffect(() => {
     const video = ref.current;
     if (!video) return;
@@ -13,10 +21,17 @@ export function HlsPlayer({ src }: { src: string }) {
     let hls: { destroy: () => void } | undefined;
     let cancelled = false;
     let retries = 0;
-    if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    const isHls = /\.m3u8($|\?)/i.test(src);
+    video.loop = !isHls;
+    if (!isHls) {
+      // Video ya kawaida (mp4/webm) — cheza moja kwa moja, ikirudia kama chaneli
       video.src = src;
       video.onerror = () => setError(true);
-      video.play().catch(() => {});
+      tryPlay(video);
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = src;
+      video.onerror = () => setError(true);
+      tryPlay(video);
     } else {
       import("hls.js").then(({ default: Hls }) => {
         if (cancelled) return;
@@ -30,7 +45,7 @@ export function HlsPlayer({ src }: { src: string }) {
         });
         h.loadSource(src);
         h.attachMedia(video);
-        h.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
+        h.on(Hls.Events.MANIFEST_PARSED, () => tryPlay(video));
         h.on(Hls.Events.ERROR, (_e, d) => {
           if (!d.fatal) return;
           // Jaribu kurudisha mtiririko kabla ya kuonyesha hitilafu
