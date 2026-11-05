@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Search, Radio, Lock } from "lucide-react";
+import { Search, Radio, Lock, Sparkles } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { aiFindChannels, type AiSearchResult } from "@/lib/ai-search.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { HlsPlayer } from "@/components/HlsPlayer";
 import { Input } from "@/components/ui/input";
@@ -29,6 +31,10 @@ function Index() {
   const [cat, setCat] = useState<string>("Zote");
   const [q, setQ] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [aiQ, setAiQ] = useState("");
+  const [aiBusy, setAiBusy] = useState(false);
+  const [ai, setAi] = useState<AiSearchResult | null>(null);
+  const findFn = useServerFn(aiFindChannels);
 
   const { data: channels = [], isLoading } = useQuery({
     queryKey: ["channels"],
@@ -120,8 +126,39 @@ function Index() {
               </button>
             ))}
           </div>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (aiQ.trim().length < 2) return;
+              setAiBusy(true);
+              try {
+                const r = await findFn({ data: { query: aiQ } });
+                setAi(r);
+                if (r.ids[0]) setSelectedId(r.ids[0]);
+              } catch {
+                setAi({ ids: [], message: "", error: "Imeshindikana kutafuta kwa sasa." });
+              } finally {
+                setAiBusy(false);
+              }
+            }}
+            className="mt-3 rounded-lg border border-accent/40 bg-accent/5 p-2"
+          >
+            <label className="flex items-center gap-1 text-xs font-semibold text-accent"><Sparkles className="h-3 w-3" /> Tafuta kwa AI</label>
+            <div className="mt-1 flex gap-2">
+              <Input value={aiQ} onChange={(e) => setAiQ(e.target.value)} placeholder="Mf. nataka mechi ya Simba leo…" maxLength={300} />
+              <Button type="submit" size="sm" disabled={aiBusy}>{aiBusy ? "…" : "Tafuta"}</Button>
+            </div>
+            {ai && (
+              <p className={cn("mt-2 text-xs", ai.error ? "text-destructive" : "text-muted-foreground")}>
+                {ai.error ?? (ai.message || (ai.ids.length ? "" : "Hakuna chaneli inayolingana."))}
+                {ai.ids.length > 0 && (
+                  <button type="button" className="ml-2 underline" onClick={() => setAi(null)}>Onyesha zote</button>
+                )}
+              </p>
+            )}
+          </form>
           <ul className="mt-4 max-h-[60vh] space-y-2 overflow-y-auto">
-            {filtered.map((c) => (
+            {(ai?.ids.length ? ai.ids.map((id) => channels.find((c) => c.id === id)!).filter(Boolean) : filtered).map((c) => (
               <li key={c.id}>
                 <button
                   onClick={() => setSelectedId(c.id)}

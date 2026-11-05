@@ -13,3 +13,5 @@
 - [x] Admin can delete services (packages)
 - [x] Rename "Kasigara Live (Bure)" channel to "Oska"
 - [x] Rename free channel to "OSCAR" + put a football video on it (auto-looping)
+- [x] AI: viewer describes match/channel, AI finds matching channels
+- [ ] Each service gets a "kiboma" (waiting on user to clarify meaning)
