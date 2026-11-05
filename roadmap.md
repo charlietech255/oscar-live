@@ -10,3 +10,4 @@
 - [x] Service form validation + clear save messages
 - [x] Admin package search + on/off filter
 - [x] Player auto-recovers streams + retry button
+- [x] Admin can delete services (packages)

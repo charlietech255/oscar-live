@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { parseM3U, guessCategory } from "@/lib/m3u";
 import { CATEGORIES, formatTsh, hasAccess, validatePackage } from "@/lib/packages";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -36,6 +37,9 @@ function Admin() {
   const [form, setForm] = useState(empty);
   const [pf, setPf] = useState(emptyPkg);
   const { data: PACKAGES = [] } = usePackages(true);
+  const [m3uUrl, setM3uUrl] = useState("");
+  const [m3uBusy, setM3uBusy] = useState(false);
+  const [m3uPremium, setM3uPremium] = useState(true);
   const [pq, setPq] = useState("");
   const [pstat, setPstat] = useState<"all" | "on" | "off">("all");
   const shownPkgs = PACKAGES.filter((k) =>
@@ -105,6 +109,46 @@ function Admin() {
     qc.invalidateQueries({ queryKey: ["packages"] });
   }
 
+  async function removePkg(id: string, label: string) {
+    if (!confirm(`Futa huduma "${label}"?`)) return;
+    const { error } = await supabase.from("packages").delete().eq("id", id);
+    if (error) { toast.error("Imeshindikana kufuta: " + error.message + " (unaweza kuizima badala yake)"); return; }
+    toast.success(`Huduma "${label}" imefutwa`);
+    if (pf.id === id) setPf(emptyPkg);
+    qc.invalidateQueries({ queryKey: ["packages"] });
+  }
+
+  async function importM3U(text: string) {
+    const list = parseM3U(text);
+    if (list.length === 0) { toast.error("Hakuna chaneli zilizopatikana kwenye playlist."); return; }
+    const existing = new Set((channels.data ?? []).map((c) => c.stream_url));
+    const start = (channels.data?.length ?? 0) + 1;
+    const rows = list.filter((c) => !existing.has(c.stream_url)).map((c, i) => ({
+      name: c.name.slice(0, 100), stream_url: c.stream_url, logo_url: c.logo_url, category: guessCategory(c.group),
+      description: c.group, is_live: true, is_premium: m3uPremium, sort_order: start + i,
+    }));
+    if (rows.length === 0) { toast.info("Chaneli zote tayari zipo."); return; }
+    for (let i = 0; i < rows.length; i += 200) {
+      const { error } = await supabase.from("channels").insert(rows.slice(i, i + 200));
+      if (error) { toast.error("Imeshindikana kuingiza: " + error.message); return; }
+    }
+    toast.success(`Chaneli ${rows.length} zimeongezwa`);
+    setM3uUrl("");
+    qc.invalidateQueries({ queryKey: ["channels"] });
+  }
+
+  async function importFromUrl() {
+    if (!m3uUrl.trim()) return;
+    setM3uBusy(true);
+    try {
+      const res = await fetch(m3uUrl.trim());
+      if (!res.ok) throw new Error(String(res.status));
+      await importM3U(await res.text());
+    } catch {
+      toast.error("Imeshindikana kupakua link hii. Pakua faili kisha uipakie hapa chini.");
+    } finally { setM3uBusy(false); }
+  }
+
   const pending = payments.data?.filter((p) => p.status === "pending").length ?? 0;
 
   return (
@@ -159,6 +203,18 @@ function Admin() {
               </div>
             ))}
           </div>
+          <div className="space-y-4">
+          <div className="space-y-3 rounded-xl border border-border bg-card p-4">
+            <h2 className="font-display text-2xl">Ingiza M3U Playlist</h2>
+            <div className="space-y-1"><Label>Link ya playlist (.m3u)</Label>
+              <div className="flex gap-2"><Input value={m3uUrl} onChange={(e) => setM3uUrl(e.target.value)} placeholder="https://…/playlist.m3u" />
+              <Button type="button" disabled={m3uBusy} onClick={importFromUrl}>{m3uBusy ? "…" : "Ingiza"}</Button></div>
+            </div>
+            <div className="space-y-1"><Label>Au pakia faili</Label>
+              <Input type="file" accept=".m3u,.m3u8,.txt" onChange={async (e) => { const f = e.target.files?.[0]; if (f) await importM3U(await f.text()); e.target.value = ""; }} />
+            </div>
+            <div className="flex items-center gap-2"><Switch checked={m3uPremium} onCheckedChange={setM3uPremium} /><Label>{m3uPremium ? "Ziwe za kulipia" : "Ziwe bure kwa wote"}</Label></div>
+          </div>
           <form onSubmit={save} className="space-y-3 rounded-xl border border-border bg-card p-4">
             <h2 className="font-display text-2xl">{form.id ? "Hariri chaneli" : "Ongeza chaneli"}</h2>
             <div className="space-y-1"><Label>Jina</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
@@ -179,6 +235,7 @@ function Admin() {
               {form.id && <Button type="button" variant="secondary" onClick={() => setForm(empty)}>Ghairi</Button>}
             </div>
           </form>
+          </div>
         </TabsContent>
 
         <TabsContent value="packages" className="mt-4 grid gap-6 lg:grid-cols-[1fr_380px]">
@@ -199,6 +256,7 @@ function Admin() {
                   {k.description && <div className="text-xs text-muted-foreground">{k.description}</div>}
                 </div>
                 <Button size="icon" variant="ghost" onClick={() => setPf({ ...emptyPkg, ...k, description: k.description ?? "" })}><Pencil className="h-4 w-4" /></Button>
+                <Button size="icon" variant="ghost" aria-label="Futa huduma" onClick={() => removePkg(k.id, k.label)}><Trash2 className="h-4 w-4" /></Button>
               </div>
             ))}
           </div>
