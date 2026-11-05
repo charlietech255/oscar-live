@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793879419577,
+      "tag": "0000_tv_streaming_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793879605020,
+      "tag": "0001_premium_and_packages",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793879781303,
+      "tag": "0002_remove_test_account",
+      "breakpoints": true
+    }
+  ]
+}

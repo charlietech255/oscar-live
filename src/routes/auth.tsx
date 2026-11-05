@@ -1,0 +1,86 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toLoginEmail } from "@/lib/packages";
+
+export const Route = createFileRoute("/auth")({
+  head: () => ({
+    meta: [
+      { title: "Ingia au Jisajili — Kasigara TV" },
+      { name: "description", content: "Jisajili kwa simu au email upate majaribio ya bure ya Kasigara TV." },
+      { property: "og:title", content: "Ingia — Kasigara TV" },
+      { property: "og:description", content: "Jisajili kwa simu au email na uanze majaribio ya bure." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: AuthPage,
+});
+
+function AuthPage() {
+  const [mode, setMode] = useState<"in" | "up">("up");
+  const [contact, setContact] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const navigate = useNavigate();
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (password.length < 6) { toast.error("Neno la siri liwe na herufi 6 au zaidi"); return; }
+    setBusy(true);
+    const email = toLoginEmail(contact);
+    const { error } =
+      mode === "up"
+        ? await supabase.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: window.location.origin, data: { display_name: name || contact, contact } },
+          })
+        : await supabase.auth.signInWithPassword({ email, password });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message.includes("Invalid") ? "Simu/email au neno la siri si sahihi" : error.message.includes("weak") ? "Neno la siri ni rahisi mno, chagua jingine gumu zaidi" : error.message);
+      return;
+    }
+    toast.success(mode === "up" ? "Karibu! Majaribio yako ya bure yameanza." : "Umeingia");
+    navigate({ to: "/" });
+  }
+
+  return (
+    <main className="mx-auto max-w-md px-4 py-10">
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <h1 className="font-display text-4xl tracking-wide">{mode === "up" ? "Jisajili" : "Ingia"}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {mode === "up" ? "Pata masaa 24 ya kutazama bure." : "Karibu tena!"}
+        </p>
+        <form onSubmit={submit} className="mt-6 space-y-4">
+          {mode === "up" && (
+            <div className="space-y-1">
+              <Label htmlFor="name">Jina</Label>
+              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jina lako" />
+            </div>
+          )}
+          <div className="space-y-1">
+            <Label htmlFor="contact">Namba ya simu au Email</Label>
+            <Input id="contact" required value={contact} onChange={(e) => setContact(e.target.value)} placeholder="07XXXXXXXX au jina@mfano.com" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="pw">Neno la siri</Label>
+            <Input id="pw" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+          </div>
+          <Button type="submit" className="w-full" disabled={busy}>
+            {busy ? "Subiri…" : mode === "up" ? "Jisajili na anza bure" : "Ingia"}
+          </Button>
+        </form>
+        <button className="mt-4 w-full text-sm text-muted-foreground hover:text-foreground" onClick={() => setMode(mode === "up" ? "in" : "up")}>
+          {mode === "up" ? "Una akaunti tayari? Ingia" : "Huna akaunti? Jisajili"}
+        </button>
+      </div>
+    </main>
+  );
+}

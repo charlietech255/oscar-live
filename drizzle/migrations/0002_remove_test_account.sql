@@ -1,0 +1,2 @@
+delete from public.payments where user_id in (select id from auth.users where email like '%@simu.tv' and created_at > '2026-11-05');
+delete from auth.users where email like '%@simu.tv' and created_at > '2026-11-05';
