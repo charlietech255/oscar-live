@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CATEGORIES, formatTsh, hasAccess } from "@/lib/packages";
+import { CATEGORIES, formatTsh, hasAccess, validatePackage } from "@/lib/packages";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -88,12 +88,14 @@ function Admin() {
   async function savePkg(e: React.FormEvent) {
     e.preventDefault();
     const { id, ...row } = pf;
-    const payload = { ...row, description: row.description || null };
+    const problem = validatePackage(row);
+    if (problem) { toast.error(problem); return; }
+    const payload = { ...row, label: row.label.trim(), description: row.description.trim() || null };
     const { error } = id
       ? await supabase.from("packages").update(payload).eq("id", id)
       : await supabase.from("packages").insert({ ...payload, id: row.label.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Math.random().toString(36).slice(2, 6) });
-    if (error) { toast.error(error.message); return; }
-    toast.success(id ? "Kifurushi kimesasishwa" : "Kifurushi kimeongezwa");
+    if (error) { toast.error("Imeshindikana kuhifadhi huduma: " + error.message); return; }
+    toast.success(id ? `Huduma "${payload.label}" imesasishwa` : `Huduma "${payload.label}" imeongezwa`);
     setPf(emptyPkg);
     qc.invalidateQueries({ queryKey: ["packages"] });
   }

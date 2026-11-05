@@ -10,3 +10,10 @@ describe("vifurushi", () => {
     expect(hasAccess({ trial_ends_at: "2026-01-01", subscription_ends_at: "2026-01-05" }, now)).toBe(true);
   });
 });
+
+import { validatePackage } from "./packages";
+describe("ukaguzi wa huduma", () => {
+  it("jina tupu linakataliwa", () => expect(validatePackage({ label: " ", price: 500, days: 1 })).not.toBeNull());
+  it("bei chini ya 100 inakataliwa", () => expect(validatePackage({ label: "Siku 1", price: 50, days: 1 })).not.toBeNull());
+  it("huduma sahihi inakubaliwa", () => expect(validatePackage({ label: "Siku 1", price: 500, days: 1 })).toBeNull());
+});

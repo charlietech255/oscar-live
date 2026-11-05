@@ -7,3 +7,4 @@
 - [x] Admin: free vs paid channels, reorder channels
 - [x] Admin: create/edit packages (services) themselves
 - [x] Admin: service form (name, description, price, on/off)
+- [x] Service form validation + clear save messages
