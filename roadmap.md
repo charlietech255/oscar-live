@@ -1,4 +1,6 @@
 # Roadmap
+- [ ] Install-first introduction with no browser service bypass
+- [ ] Admin editing of channels and outside introduction — clarify which outside elements should be editable
 - [x] Live player, channel list, search, categories
 - [x] Packages + M-Pesa/Tigo payment reference
 - [x] Accounts (phone/email) + free trial

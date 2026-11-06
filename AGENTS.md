@@ -35,3 +35,4 @@ use the editor.
 - Channel logo uploads are resized in the browser and saved as compact data URLs in channels.logo_url through existing admin-only writes. Why: durable logos without public storage buckets or expiring links.
 - Channel picture cards use the admin logo with a bundled fallback image and the existing player/access gate. Why: every channel is visually selectable without bypassing subscriptions.
 - Home-screen installation stays manifest-only; capture the browser install prompt in the shared root provider. Why: prompts can arrive before the install page opens, and streaming does not require offline caching.
+- Gate service UI at the shared layout using hydrated standalone display mode, leaving installation instructions available. Why: install acceptance alone does not mean the customer has launched the home-screen app; this is a UX gate, not a database security boundary.

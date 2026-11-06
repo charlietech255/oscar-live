@@ -15,6 +15,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Toaster } from "@/components/ui/sonner";
 import { InstallProvider } from "@/components/InstallProvider";
+import { useInstall } from "@/components/InstallProvider";
+import { InstallGate } from "@/components/InstallGate";
 
 function NotFoundComponent() {
   return (
@@ -121,11 +123,22 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <InstallProvider>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <SiteHeader />
-      <Outlet />
-      <Toaster />
+      <AppContent />
       </InstallProvider>
     </QueryClientProvider>
+  );
+}
+
+function AppContent() {
+  const { ready, standalone } = useInstall();
+  return (
+    <>
+      <InstallGate>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      {ready && standalone && <SiteHeader />}
+      <Outlet />
+      </InstallGate>
+      <Toaster />
+    </>
   );
 }

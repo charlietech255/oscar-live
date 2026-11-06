@@ -8,18 +8,27 @@ type InstallPrompt = Event & {
 const InstallContext = createContext<{
   available: boolean;
   installed: boolean;
+  standalone: boolean;
+  ready: boolean;
   busy: boolean;
   install: () => Promise<"accepted" | "dismissed" | "unavailable" | "error">;
-}>({ available: false, installed: false, busy: false, install: async () => "unavailable" });
+}>({ available: false, installed: false, standalone: false, ready: false, busy: false, install: async () => "unavailable" });
 
 export function InstallProvider({ children }: { children: ReactNode }) {
   const [prompt, setPrompt] = useState<InstallPrompt | null>(null);
   const [installed, setInstalled] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [standaloneMode, setStandaloneMode] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const standalone = window.matchMedia("(display-mode: standalone)");
-    const sync = () => setInstalled(standalone.matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone));
+    const sync = () => {
+      const inApp = standalone.matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+      setStandaloneMode(inApp);
+      setInstalled(inApp);
+      setReady(true);
+    };
     const capture = (event: Event) => {
       event.preventDefault();
       setPrompt(event as InstallPrompt);
@@ -50,7 +59,7 @@ export function InstallProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  return <InstallContext.Provider value={{ available: Boolean(prompt), installed, busy, install }}>{children}</InstallContext.Provider>;
+  return <InstallContext.Provider value={{ available: Boolean(prompt), installed, standalone: standaloneMode, ready, busy, install }}>{children}</InstallContext.Provider>;
 }
 
 export const useInstall = () => useContext(InstallContext);
