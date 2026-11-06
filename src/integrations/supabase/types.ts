@@ -155,6 +155,39 @@ export type Database = {
         }
         Relationships: []
       }
+      site_appearance: {
+        Row: {
+          button_label: string
+          description: string
+          id: string
+          image_url: string | null
+          logo_url: string | null
+          tagline: string
+          theme: string
+          title: string
+        }
+        Insert: {
+          button_label?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          logo_url?: string | null
+          tagline?: string
+          theme?: string
+          title?: string
+        }
+        Update: {
+          button_label?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          logo_url?: string | null
+          tagline?: string
+          theme?: string
+          title?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

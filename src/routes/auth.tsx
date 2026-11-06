@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toLoginEmail } from "@/lib/packages";
+import { useInstall } from "@/components/InstallProvider";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -28,6 +29,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
+  const { standalone } = useInstall();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,7 +50,7 @@ function AuthPage() {
       return;
     }
     toast.success(mode === "up" ? "Karibu! Majaribio yako ya bure yameanza." : "Umeingia");
-    navigate({ to: "/" });
+    navigate({ to: standalone ? "/" : "/sakinisha" });
   }
 
   return (
@@ -77,9 +79,10 @@ function AuthPage() {
             {busy ? "Subiri…" : mode === "up" ? "Jisajili na anza bure" : "Ingia"}
           </Button>
         </form>
-        <button className="mt-4 w-full text-sm text-muted-foreground hover:text-foreground" onClick={() => setMode(mode === "up" ? "in" : "up")}>
+        <Button variant="ghost" className="mt-4 w-full text-sm text-muted-foreground" onClick={() => setMode(mode === "up" ? "in" : "up")}>
           {mode === "up" ? "Una akaunti tayari? Ingia" : "Huna akaunti? Jisajili"}
-        </button>
+        </Button>
+        {!standalone && <Button asChild variant="link" className="mt-2 w-full"><Link to="/sakinisha">Sakinisha app kwenye simu</Link></Button>}
       </div>
     </main>
   );

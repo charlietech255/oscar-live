@@ -36,3 +36,4 @@ use the editor.
 - Channel picture cards use the admin logo with a bundled fallback image and the existing player/access gate. Why: every channel is visually selectable without bypassing subscriptions.
 - Home-screen installation stays manifest-only; capture the browser install prompt in the shared root provider. Why: prompts can arrive before the install page opens, and streaming does not require offline caching.
 - Gate service UI at the shared layout using hydrated standalone display mode, leaving installation instructions available. Why: install acceptance alone does not mean the customer has launched the home-screen app; this is a UX gate, not a database security boundary.
+- Store editable outside appearance in a public-read, admin-write singleton with preset semantic color themes; allow authenticated admins to manage it from a browser. Why: changes persist for all visitors without allowing customer changes or requiring installation for administration.

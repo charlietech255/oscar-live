@@ -1,7 +1,7 @@
 const supportedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
 /** Store a compact logo in the existing logo_url field, without external image hosting. */
-export async function prepareChannelLogo(file: File): Promise<string> {
+export async function prepareChannelLogo(file: File, maxDimension = 384): Promise<string> {
   if (!supportedTypes.has(file.type)) {
     throw new Error("Chagua picha ya JPG, PNG, WEBP au GIF. Kwa HEIC, ibadilishe kuwa JPG kwanza.");
   }
@@ -10,7 +10,7 @@ export async function prepareChannelLogo(file: File): Promise<string> {
     const image = new Image();
     image.src = objectUrl;
     await image.decode();
-    const scale = Math.min(1, 384 / Math.max(image.naturalWidth, image.naturalHeight));
+    const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
     canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));

@@ -1,6 +1,8 @@
 # Roadmap
-- [ ] Install-first introduction with no browser service bypass
-- [ ] Admin editing of channels and outside introduction — clarify which outside elements should be editable
+- [x] Show registration and sign-in from the outside introduction without opening channels
+- [x] Install-first introduction with no browser service bypass
+- [x] Admin editing of outside picture, logo, text, theme and install button
+- [ ] Verify admin appearance save end-to-end — needs the user to sign in as admin in preview
 - [x] Live player, channel list, search, categories
 - [x] Packages + M-Pesa/Tigo payment reference
 - [x] Accounts (phone/email) + free trial

@@ -36,6 +36,13 @@
       "when": 1793883421093,
       "tag": "0004_packages_image",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793942102480,
+      "tag": "0005_site_appearance",
+      "breakpoints": true
     }
   ]
 }

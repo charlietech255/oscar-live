@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { parseM3U, guessCategory } from "@/lib/m3u";
 import { CATEGORIES, formatTsh, hasAccess, validatePackage } from "@/lib/packages";
 import { prepareChannelLogo } from "@/lib/channel-logo";
+import { AppearanceEditor } from "@/components/AppearanceEditor";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -176,11 +177,12 @@ function Admin() {
     <main className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="font-display text-5xl tracking-wide">Usimamizi</h1>
       <Tabs defaultValue="payments" className="mt-6">
-        <TabsList>
+        <TabsList className="h-auto flex-wrap justify-start">
           <TabsTrigger value="payments">Malipo {pending > 0 && `(${pending})`}</TabsTrigger>
           <TabsTrigger value="channels">Chaneli</TabsTrigger>
           <TabsTrigger value="packages">Vifurushi</TabsTrigger>
           <TabsTrigger value="users">Watumiaji</TabsTrigger>
+          <TabsTrigger value="appearance">Muonekano wa nje</TabsTrigger>
         </TabsList>
 
         <TabsContent value="payments" className="mt-4 space-y-2">
@@ -333,6 +335,7 @@ function Admin() {
             </table>
           </div>
         </TabsContent>
+        <TabsContent value="appearance" className="mt-6"><AppearanceEditor /></TabsContent>
       </Tabs>
     </main>
   );

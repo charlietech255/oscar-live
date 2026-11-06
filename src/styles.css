@@ -115,3 +115,7 @@
     background-repeat: no-repeat;
   }
 }
+
+.install-theme-green { --primary: oklch(0.84 0.2 140); --primary-foreground: oklch(0.18 0.03 250); }
+.install-theme-red { --primary: oklch(0.72 0.19 25); --primary-foreground: oklch(0.18 0.03 250); }
+.install-theme-cyan { --primary: oklch(0.8 0.13 205); --primary-foreground: oklch(0.18 0.03 250); }
