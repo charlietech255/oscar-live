@@ -17,4 +17,5 @@
 - [x] Each service (package) has a picture/logo
 - [x] Player: visible sound + fullscreen buttons
 - [x] Admin: upload channel logos from a phone and save with the channel
+- [x] Channel picture cards: tap to open the player and start playback
 - [ ] myTV (clver.store) API integration — blocked: needs broadcast rights confirmation

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
-import { Search, Radio, Lock, Sparkles } from "lucide-react";
+import { Search, Radio, Lock, Sparkles, Play } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { aiFindChannels, type AiSearchResult } from "@/lib/ai-search.functions";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { CATEGORIES, hasAccess } from "@/lib/packages";
 import { cn } from "@/lib/utils";
+import channelCover from "@/assets/channel-cover.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -53,6 +54,19 @@ function Index() {
   );
   const current = channels.find((c) => c.id === selectedId) ?? channels[0];
   const access = !!current && (!current.is_premium || hasAccess(profile));
+  const shownChannels = ai?.ids.length
+    ? ai.ids.flatMap((id) => { const channel = channels.find((c) => c.id === id); return channel ? [channel] : []; })
+    : filtered;
+
+  function openChannel(id: string) {
+    setSelectedId(id);
+    setFoundName(null);
+    playerRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
+    if (current?.id === id) {
+      const video = playerRef.current?.querySelector("video");
+      if (video) video.play().catch(() => { video.muted = true; void video.play().catch(() => {}); });
+    }
+  }
 
   async function runAi(query: string) {
     if (query.trim().length < 2 || aiBusy) return;
@@ -110,7 +124,7 @@ function Index() {
             <p className="mb-2 rounded-lg bg-primary/15 px-3 py-2 text-sm font-semibold text-primary">Tumekupatia: {foundName} — inacheza sasa!</p>
           )}
           {current && access ? (
-            <HlsPlayer src={current.stream_url} />
+            <HlsPlayer key={current.id} src={current.stream_url} />
           ) : (
             <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-6 text-center">
               <Lock className="h-10 w-10 text-primary" />
@@ -156,7 +170,7 @@ function Index() {
           )}
         </section>
 
-        <aside className="rounded-xl border border-border bg-card p-4">
+        <aside className="min-w-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tafuta chaneli…" className="pl-9" />
@@ -175,29 +189,36 @@ function Index() {
               </button>
             ))}
           </div>
-          <ul className="mt-4 max-h-[60vh] space-y-2 overflow-y-auto">
-            {(ai?.ids.length ? ai.ids.map((id) => channels.find((c) => c.id === id)!).filter(Boolean) : filtered).map((c) => (
-              <li key={c.id}>
-                <button
-                  onClick={() => { setSelectedId(c.id); setFoundName(null); }}
+          <ul className="mt-4 grid grid-cols-2 gap-3 lg:max-h-[70vh] lg:overflow-y-auto lg:p-1">
+            {shownChannels.map((c) => (
+              <li key={c.id} className="min-w-0">
+                <Button
+                  variant="ghost"
+                  aria-label={`Tazama ${c.name}`}
+                  aria-pressed={current?.id === c.id}
+                  onClick={() => openChannel(c.id)}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors",
-                    current?.id === c.id ? "bg-primary/15 ring-1 ring-primary" : "hover:bg-secondary",
+                    "group flex h-auto w-full flex-col items-stretch gap-0 overflow-hidden whitespace-normal rounded-lg border p-0 text-left transition-colors",
+                    current?.id === c.id ? "border-primary bg-primary/10 ring-1 ring-primary" : "border-border bg-card hover:bg-secondary",
                   )}
                 >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md bg-secondary font-display text-lg text-primary">
-                    {c.logo_url ? <img src={c.logo_url} alt="" className="h-full w-full object-cover" loading="lazy" /> : c.name.slice(0, 2)}
+                  <div className="relative aspect-video w-full overflow-hidden bg-secondary">
+                    <img src={c.logo_url || channelCover} alt="" className={cn("h-full w-full", c.logo_url ? "object-contain p-3" : "object-cover")} loading="lazy" width={384} height={216} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = channelCover; }} />
+                    <span className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-background/85 text-primary">
+                      {c.is_premium && !hasAccess(profile) ? <Lock className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
+                    </span>
+                    {!c.is_premium && <span className="absolute left-2 top-2 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">BURE</span>}
+                    {c.is_live && <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded bg-live px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground"><Radio className="h-3 w-3" /> LIVE</span>}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate font-semibold">{c.name}</div>
+                  <div className="min-w-0 p-2.5">
+                    <div className="min-h-10 break-words text-sm font-semibold leading-5">{c.name}</div>
                     <div className="text-xs text-muted-foreground">{c.category}</div>
                   </div>
-                  {!c.is_premium && <span className="rounded bg-primary/20 px-1.5 py-0.5 text-[10px] font-bold text-primary">BURE</span>}
-                  {c.is_live && <span className="h-2 w-2 rounded-full bg-live" />}
-                </button>
+                </Button>
               </li>
             ))}
-            {!isLoading && filtered.length === 0 && <li className="p-4 text-center text-sm text-muted-foreground">Hakuna chaneli iliyopatikana.</li>}
+            {isLoading && <li className="col-span-2 p-4 text-center text-sm text-muted-foreground">Inapakia chaneli…</li>}
+            {!isLoading && shownChannels.length === 0 && <li className="col-span-2 p-4 text-center text-sm text-muted-foreground">Hakuna chaneli iliyopatikana.</li>}
           </ul>
         </aside>
       </div>
