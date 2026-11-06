@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useInstall } from "./InstallProvider";
 import { canViewServices } from "@/lib/install-access";
 import stadium from "@/assets/install-stadium.jpg";
+import insidePreview from "@/assets/app-inside-preview.jpg";
 import { useQuery } from "@tanstack/react-query";
 import { appearanceOptions, defaultAppearance } from "@/lib/site-appearance";
 import { useAuth } from "@/hooks/useAuth";
@@ -55,6 +56,12 @@ function InstallIntroduction() {
       <section className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-8">
         <Smartphone className="h-8 w-8 shrink-0 text-primary" />
         <div><h2 className="font-display text-2xl">APP KWENYE SIMU YAKO</h2><p className="text-sm text-muted-foreground">Android au iPhone. Hakuna APK inayohitajika; kutazama kunahitaji intaneti.</p></div>
+      </section>
+      <section className="mx-auto max-w-6xl px-6 pb-12">
+        <h2 className="font-display text-3xl">NDANI YA KASIGARA TV</h2>
+        <figure className="mt-4 max-w-md">
+          <img src={insidePreview} alt="Muonekano wa ndani wa Kasigara TV: utafutaji, makundi na picha za chaneli" width={395} height={310} loading="lazy" className="h-auto w-full rounded-lg border border-border" />
+        </figure>
       </section>
     </main>
   );
