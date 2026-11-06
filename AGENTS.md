@@ -32,3 +32,4 @@ use the editor.
 - Access/prices are enforced in the database (packages table, payment amount trigger, review_payment function); UI only reads them. Why: users can't fake prices or self-activate.
 - First account to sign up becomes admin (handle_new_user trigger). Why: owner bootstraps the admin panel without manual setup.
 - Phone sign-up maps to a synthetic `<phone>@simu.tv` login email with auto-confirm on. Why: phone login without SMS.
+- Channel logo uploads are resized in the browser and saved as compact data URLs in channels.logo_url through existing admin-only writes. Why: durable logos without public storage buckets or expiring links.

@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Pencil, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { Pencil, Trash2, ArrowUp, ArrowDown, Upload, Loader2 } from "lucide-react";
 import { usePackages } from "@/hooks/usePackages";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { parseM3U, guessCategory } from "@/lib/m3u";
 import { CATEGORIES, formatTsh, hasAccess, validatePackage } from "@/lib/packages";
+import { prepareChannelLogo } from "@/lib/channel-logo";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -35,6 +36,9 @@ function Admin() {
   const { isAdmin, user } = useAuth();
   const qc = useQueryClient();
   const [form, setForm] = useState(empty);
+  const logoInput = useRef<HTMLInputElement>(null);
+  const [logoBusy, setLogoBusy] = useState(false);
+  const [savingChannel, setSavingChannel] = useState(false);
   const [pf, setPf] = useState(emptyPkg);
   const { data: PACKAGES = [] } = usePackages(true);
   const [m3uUrl, setM3uUrl] = useState("");
@@ -57,13 +61,30 @@ function Admin() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    if (logoBusy || savingChannel) return;
+    setSavingChannel(true);
     const { id, ...row } = form;
     const payload = { ...row, logo_url: row.logo_url || null, description: row.description || null };
+    try {
     const { error } = id ? await supabase.from("channels").update(payload).eq("id", id) : await supabase.from("channels").insert(payload);
     if (error) { toast.error(error.message); return; }
     toast.success(id ? "Chaneli imesasishwa" : "Chaneli imeongezwa");
     setForm(empty);
     qc.invalidateQueries({ queryKey: ["channels"] });
+    } catch {
+      toast.error("Imeshindikana kuhifadhi chaneli. Jaribu tena.");
+    } finally { setSavingChannel(false); }
+  }
+
+  async function uploadLogo(file: File) {
+    setLogoBusy(true);
+    try {
+      const logo = await prepareChannelLogo(file);
+      setForm((current) => ({ ...current, logo_url: logo }));
+      toast.success("Picha iko tayari. Bonyeza Hifadhi au Ongeza kuiweka kwenye chaneli.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Imeshindikana kupakia picha. Jaribu tena.");
+    } finally { setLogoBusy(false); }
   }
 
   async function remove(id: string) {
@@ -190,6 +211,7 @@ function Admin() {
                   <button aria-label="Panda juu" onClick={() => move(i, -1)} className="text-muted-foreground hover:text-foreground"><ArrowUp className="h-4 w-4" /></button>
                   <button aria-label="Shuka chini" onClick={() => move(i, 1)} className="text-muted-foreground hover:text-foreground"><ArrowDown className="h-4 w-4" /></button>
                 </div>
+                {c.logo_url && <img src={c.logo_url} alt="" className="h-10 w-10 shrink-0 rounded object-contain" />}
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold">{c.name} <span className="text-xs text-muted-foreground">· {c.category}{c.is_live ? " · LIVE" : ""}</span></div>
                   <div className="truncate text-xs text-muted-foreground">{c.stream_url}</div>
@@ -225,14 +247,30 @@ function Admin() {
               </select>
             </div>
             <div className="space-y-1"><Label>Link ya stream (.m3u8)</Label><Input required value={form.stream_url} onChange={(e) => setForm({ ...form, stream_url: e.target.value })} placeholder="https://…/index.m3u8" /></div>
-            <div className="space-y-1"><Label>Link ya logo (si lazima)</Label><Input value={form.logo_url} onChange={(e) => setForm({ ...form, logo_url: e.target.value })} /></div>
+             <div className="space-y-2">
+               <Label>Nembo ya chaneli (si lazima)</Label>
+               {form.logo_url && <img src={form.logo_url} alt="Nembo iliyochaguliwa" className="h-20 w-20 rounded border border-border bg-background object-contain" />}
+               <input ref={logoInput} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" aria-label="Chagua picha ya nembo" onChange={(e) => {
+                 const file = e.target.files?.[0];
+                 e.target.value = "";
+                 if (file) void uploadLogo(file);
+               }} />
+               <div className="flex flex-wrap gap-2">
+                 <Button type="button" variant="secondary" disabled={logoBusy || savingChannel} onClick={() => logoInput.current?.click()}>
+                   {logoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                   {logoBusy ? "Inaandaa picha…" : "Pakia picha"}
+                 </Button>
+                 {form.logo_url && <Button type="button" variant="ghost" disabled={logoBusy || savingChannel} onClick={() => setForm((current) => ({ ...current, logo_url: "" }))}><Trash2 className="h-4 w-4" />Ondoa picha</Button>}
+               </div>
+               <Input aria-label="Link ya logo" value={form.logo_url.startsWith("data:") ? "" : form.logo_url} disabled={logoBusy || savingChannel} placeholder="Au bandika link ya picha" onChange={(e) => setForm({ ...form, logo_url: e.target.value })} />
+             </div>
             <div className="space-y-1"><Label>Maelezo</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
             <div className="space-y-1"><Label>Mpangilio</Label><Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: Number(e.target.value) })} /></div>
             <div className="flex items-center gap-2"><Switch checked={form.is_live} onCheckedChange={(v) => setForm({ ...form, is_live: v })} /><Label>Live sasa</Label></div>
             <div className="flex items-center gap-2"><Switch checked={form.is_premium} onCheckedChange={(v) => setForm({ ...form, is_premium: v })} /><Label>{form.is_premium ? "Ya kulipia" : "Bure kwa wote"}</Label></div>
             <div className="flex gap-2">
-              <Button type="submit">{form.id ? "Hifadhi" : "Ongeza"}</Button>
-              {form.id && <Button type="button" variant="secondary" onClick={() => setForm(empty)}>Ghairi</Button>}
+               <Button type="submit" disabled={logoBusy || savingChannel}>{savingChannel ? "Inahifadhi…" : form.id ? "Hifadhi" : "Ongeza"}</Button>
+               {form.id && <Button type="button" variant="secondary" disabled={logoBusy || savingChannel} onClick={() => setForm(empty)}>Ghairi</Button>}
             </div>
           </form>
           </div>
