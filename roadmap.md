@@ -16,3 +16,4 @@
 - [x] AI: viewer describes match/channel, AI finds matching channels
 - [x] Each service (package) has a picture/logo
 - [x] Player: visible sound + fullscreen buttons
+- [ ] myTV (clver.store) API integration — blocked: needs broadcast rights confirmation

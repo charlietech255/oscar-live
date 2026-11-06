@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Search, Radio, Lock, Sparkles } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { aiFindChannels, type AiSearchResult } from "@/lib/ai-search.functions";
@@ -35,6 +35,8 @@ function Index() {
   const [aiBusy, setAiBusy] = useState(false);
   const [ai, setAi] = useState<AiSearchResult | null>(null);
   const findFn = useServerFn(aiFindChannels);
+  const playerRef = useRef<HTMLElement>(null);
+  const [foundName, setFoundName] = useState<string | null>(null);
 
   const { data: channels = [], isLoading } = useQuery({
     queryKey: ["channels"],
@@ -52,14 +54,61 @@ function Index() {
   const current = channels.find((c) => c.id === selectedId) ?? channels[0];
   const access = !!current && (!current.is_premium || hasAccess(profile));
 
+  async function runAi(query: string) {
+    if (query.trim().length < 2 || aiBusy) return;
+    setAiBusy(true);
+    setFoundName(null);
+    try {
+      const r = await findFn({ data: { query } });
+      setAi(r);
+      const first = channels.find((c) => c.id === r.ids[0]);
+      if (first) {
+        setSelectedId(first.id);
+        setFoundName(first.name);
+        playerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } catch {
+      setAi({ ids: [], message: "", error: "Imeshindikana kutafuta kwa sasa." });
+    } finally {
+      setAiBusy(false);
+    }
+  }
+
   const trialLeft = profile && new Date(profile.trial_ends_at) > new Date()
     ? Math.ceil((new Date(profile.trial_ends_at).getTime() - Date.now()) / 3600000)
     : 0;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6">
+      <form
+        onSubmit={(e) => { e.preventDefault(); runAi(aiQ); }}
+        className="mb-5 rounded-xl border border-accent/40 bg-accent/5 p-3"
+      >
+        <label className="flex items-center gap-1 text-sm font-semibold text-accent"><Sparkles className="h-4 w-4" /> Tafuta mechi kwa AI</label>
+        <div className="mt-2 flex gap-2">
+          <Input value={aiQ} onChange={(e) => setAiQ(e.target.value)} placeholder="Mf. Simba vs Yanga, Ligi Kuu, Arsenal…" maxLength={300} />
+          <Button type="submit" disabled={aiBusy}>{aiBusy ? "Inatafuta…" : "Tafuta"}</Button>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {["Ligi Kuu", "Mechi za leo", "Chaneli za bure", "Filamu"].map((t) => (
+            <button key={t} type="button" disabled={aiBusy} onClick={() => { setAiQ(t); runAi(t); }}
+              className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground hover:bg-muted">{t}</button>
+          ))}
+        </div>
+        {ai && (
+          <p className={cn("mt-2 text-sm", ai.error ? "text-destructive" : "text-muted-foreground")}>
+            {ai.error ?? (ai.message || (ai.ids.length ? "" : "Hakuna chaneli inayolingana."))}
+            {ai.ids.length > 0 && (
+              <button type="button" className="ml-2 underline" onClick={() => setAi(null)}>Onyesha zote</button>
+            )}
+          </p>
+        )}
+      </form>
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-        <section>
+        <section ref={playerRef} className="scroll-mt-20">
+          {foundName && (
+            <p className="mb-2 rounded-lg bg-primary/15 px-3 py-2 text-sm font-semibold text-primary">Tumekupatia: {foundName} — inacheza sasa!</p>
+          )}
           {current && access ? (
             <HlsPlayer src={current.stream_url} />
           ) : (
@@ -126,42 +175,11 @@ function Index() {
               </button>
             ))}
           </div>
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              if (aiQ.trim().length < 2) return;
-              setAiBusy(true);
-              try {
-                const r = await findFn({ data: { query: aiQ } });
-                setAi(r);
-                if (r.ids[0]) setSelectedId(r.ids[0]);
-              } catch {
-                setAi({ ids: [], message: "", error: "Imeshindikana kutafuta kwa sasa." });
-              } finally {
-                setAiBusy(false);
-              }
-            }}
-            className="mt-3 rounded-lg border border-accent/40 bg-accent/5 p-2"
-          >
-            <label className="flex items-center gap-1 text-xs font-semibold text-accent"><Sparkles className="h-3 w-3" /> Tafuta kwa AI</label>
-            <div className="mt-1 flex gap-2">
-              <Input value={aiQ} onChange={(e) => setAiQ(e.target.value)} placeholder="Mf. nataka mechi ya Simba leo…" maxLength={300} />
-              <Button type="submit" size="sm" disabled={aiBusy}>{aiBusy ? "…" : "Tafuta"}</Button>
-            </div>
-            {ai && (
-              <p className={cn("mt-2 text-xs", ai.error ? "text-destructive" : "text-muted-foreground")}>
-                {ai.error ?? (ai.message || (ai.ids.length ? "" : "Hakuna chaneli inayolingana."))}
-                {ai.ids.length > 0 && (
-                  <button type="button" className="ml-2 underline" onClick={() => setAi(null)}>Onyesha zote</button>
-                )}
-              </p>
-            )}
-          </form>
           <ul className="mt-4 max-h-[60vh] space-y-2 overflow-y-auto">
             {(ai?.ids.length ? ai.ids.map((id) => channels.find((c) => c.id === id)!).filter(Boolean) : filtered).map((c) => (
               <li key={c.id}>
                 <button
-                  onClick={() => setSelectedId(c.id)}
+                  onClick={() => { setSelectedId(c.id); setFoundName(null); }}
                   className={cn(
                     "flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors",
                     current?.id === c.id ? "bg-primary/15 ring-1 ring-primary" : "hover:bg-secondary",
