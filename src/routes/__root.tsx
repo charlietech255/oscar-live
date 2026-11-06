@@ -17,6 +17,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { InstallProvider } from "@/components/InstallProvider";
 import { useInstall } from "@/components/InstallProvider";
 import { InstallGate } from "@/components/InstallGate";
+import { useAuth } from "@/hooks/useAuth";
 
 function NotFoundComponent() {
   return (
@@ -131,11 +132,12 @@ function RootComponent() {
 
 function AppContent() {
   const { ready, standalone } = useInstall();
+  const { user } = useAuth();
   return (
     <>
       <InstallGate>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      {ready && standalone && <SiteHeader />}
+      {ready && (standalone || user) && <SiteHeader />}
       <Outlet />
       </InstallGate>
       <Toaster />

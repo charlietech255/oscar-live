@@ -36,7 +36,7 @@ function AuthPage() {
     if (password.length < 6) { toast.error("Neno la siri liwe na herufi 6 au zaidi"); return; }
     setBusy(true);
     const email = toLoginEmail(contact);
-    const { error } =
+    const { data, error } =
       mode === "up"
         ? await supabase.auth.signUp({
             email,
@@ -49,8 +49,12 @@ function AuthPage() {
       toast.error(error.message.includes("Invalid") ? "Simu/email au neno la siri si sahihi" : error.message.includes("weak") ? "Neno la siri ni rahisi mno, chagua jingine gumu zaidi" : error.message);
       return;
     }
+    if (!data.session) {
+      toast.success("Akaunti imetengenezwa. Angalia ujumbe wa kuthibitisha email yako, kisha ingia.");
+      return;
+    }
     toast.success(mode === "up" ? "Karibu! Majaribio yako ya bure yameanza." : "Umeingia");
-    navigate({ to: standalone ? "/" : "/sakinisha" });
+    navigate({ to: "/" });
   }
 
   return (

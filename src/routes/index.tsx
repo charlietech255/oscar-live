@@ -173,13 +173,13 @@ function Index() {
         <aside className="min-w-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tafuta chaneli…" className="pl-9" />
+            <Input value={q} onChange={(e) => { setQ(e.target.value); setAi(null); }} placeholder="Tafuta chaneli…" className="pl-9" />
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {["Zote", ...CATEGORIES].map((c) => (
               <button
                 key={c}
-                onClick={() => setCat(c)}
+                onClick={() => { setCat(c); setAi(null); }}
                 className={cn(
                   "rounded-full px-3 py-1 text-sm font-medium transition-colors",
                   cat === c ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted",

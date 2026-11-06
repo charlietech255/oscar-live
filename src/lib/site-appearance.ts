@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const defaultAppearance = {
   id: "main", title: "KASIGARA TV", tagline: "Mpira · TV · Burudani",
-  description: "Mechi na burudani kwenye simu yako. Sakinisha app kwanza, kisha fungua kupitia ikoni yake kuona chaneli na kuingia kwenye akaunti.",
+  description: "Mechi na burudani kwenye simu yako. Jisajili, chagua chaneli na uguse picha yake kuanza kutazama. Unaweza pia kusakinisha app kwenye simu.",
   button_label: "Sakinisha app", image_url: null as string | null, logo_url: null as string | null, theme: "green",
 };
 export type Appearance = typeof defaultAppearance;

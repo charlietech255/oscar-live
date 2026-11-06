@@ -1,3 +1,3 @@
-export function canViewServices(standalone: boolean): boolean {
-  return standalone;
+export function canViewServices(standalone: boolean, signedIn = false): boolean {
+  return standalone || signedIn;
 }

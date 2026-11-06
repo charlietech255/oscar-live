@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Registration opens channels directly; keep phone installation available and tap-to-play cards
+- [ ] Verify real signed-in customer redirect — needs the user to sign in in preview
 - [x] Outside mobile data promotion with seven user-supplied prices
 - [x] Show registration and sign-in from the outside introduction without opening channels
 - [x] Install-first introduction with no browser service bypass

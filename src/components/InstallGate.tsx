@@ -15,9 +15,9 @@ import { useAuth } from "@/hooks/useAuth";
 export function InstallGate({ children }: { children: ReactNode }) {
   const { ready, standalone } = useInstall();
   const location = useLocation();
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   if (isAdmin && location.pathname === "/admin") return children;
-  if (ready && canViewServices(standalone)) return children;
+  if (ready && canViewServices(standalone, Boolean(user))) return children;
   if (location.pathname === "/sakinisha" || location.pathname === "/auth") return children;
   return <InstallIntroduction />;
 }
