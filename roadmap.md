@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Outside mobile data promotion with seven user-supplied prices
 - [x] Show registration and sign-in from the outside introduction without opening channels
 - [x] Install-first introduction with no browser service bypass
 - [x] Admin editing of outside picture, logo, text, theme and install button

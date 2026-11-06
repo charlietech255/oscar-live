@@ -6,6 +6,8 @@ import { useInstall } from "./InstallProvider";
 import { canViewServices } from "@/lib/install-access";
 import stadium from "@/assets/install-stadium.jpg";
 import insidePreview from "@/assets/app-inside-preview.jpg";
+import mobileData from "@/assets/mobile-data.jpg";
+import { dataBundles } from "@/lib/data-bundles";
 import { useQuery } from "@tanstack/react-query";
 import { appearanceOptions, defaultAppearance } from "@/lib/site-appearance";
 import { useAuth } from "@/hooks/useAuth";
@@ -57,7 +59,24 @@ function InstallIntroduction() {
         <Smartphone className="h-8 w-8 shrink-0 text-primary" />
         <div><h2 className="font-display text-2xl">APP KWENYE SIMU YAKO</h2><p className="text-sm text-muted-foreground">Android au iPhone. Hakuna APK inayohitajika; kutazama kunahitaji intaneti.</p></div>
       </section>
-      <section className="mx-auto max-w-6xl px-6 pb-12">
+      <section className="border-y border-border bg-card">
+        <div className="mx-auto max-w-6xl px-6 py-10">
+          <div className="relative isolate overflow-hidden rounded-lg bg-background px-6 py-8 sm:px-8">
+            <img src={mobileData} alt="Simu na laini za intaneti" width={1200} height={800} loading="lazy" className="absolute inset-0 -z-20 h-full w-full object-cover object-right" />
+            <div className="absolute inset-0 -z-10 bg-background/60" />
+            <p className="text-sm font-semibold uppercase text-accent">Vifurushi vya intaneti</p>
+            <h2 className="mt-2 font-display text-4xl sm:text-5xl">TUNAUZA PIA GB</h2>
+            <p className="mt-2 text-sm text-foreground">Chagua kiasi cha MB au GB unachohitaji.</p>
+          </div>
+          <dl className="mt-6 grid grid-cols-2 gap-x-6 sm:grid-cols-3 lg:grid-cols-4">
+            {dataBundles.map(bundle => <div key={bundle.label} className="border-b border-border py-5">
+              <dt className="font-display text-3xl">{bundle.label}</dt>
+              <dd className="mt-1 font-semibold text-primary">TSh {bundle.price.toLocaleString("en-US")}</dd>
+            </div>)}
+          </dl>
+        </div>
+      </section>
+      <section className="mx-auto max-w-6xl px-6 py-10">
         <h2 className="font-display text-3xl">NDANI YA KASIGARA TV</h2>
         <figure className="mt-4 max-w-md">
           <img src={insidePreview} alt="Muonekano wa ndani wa Kasigara TV: utafutaji, makundi na picha za chaneli" width={395} height={310} loading="lazy" className="h-auto w-full rounded-lg border border-border" />
