@@ -62,7 +62,7 @@ function Packages() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="font-display text-5xl tracking-wide">Vifurushi</h1>
+      <h1 className="font-display text-3xl tracking-wide">Vifurushi</h1>
       <p className="text-muted-foreground">Chagua kifurushi, lipia, kisha tuma namba ya muamala.</p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -73,8 +73,8 @@ function Packages() {
             className={cn("rounded-2xl border bg-card p-5 text-left transition-all", pkg === p.id ? "border-primary ring-2 ring-primary" : "border-border hover:border-muted-foreground")}
           >
             {p.image_url && <img src={p.image_url} alt={p.label} loading="lazy" className="mb-3 h-16 w-16 rounded-lg object-cover" />}
-            <div className="font-display text-3xl">{p.label}</div>
-            <div className="mt-2 text-2xl font-bold text-primary">{formatTsh(p.price)}</div>
+            <div className="font-display text-xl">{p.label}</div>
+            <div className="mt-2 text-lg font-bold text-primary">{formatTsh(p.price)}</div>
             <div className="mt-2 text-sm text-muted-foreground">{p.description || `Chaneli zote · Siku ${p.days}`}</div>
           </button>
         ))}
@@ -82,7 +82,7 @@ function Packages() {
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         <section className="rounded-2xl border border-border bg-card p-6">
-          <h2 className="font-display text-3xl">Jinsi ya kulipia</h2>
+          <h2 className="font-display text-xl">Jinsi ya kulipia</h2>
           <ol className="mt-4 space-y-3 text-sm">
             {[
               <>Piga <b>*150*00#</b> (M-Pesa) au <b>*150*01#</b> (Tigo Pesa / Mixx)</>,
@@ -104,7 +104,7 @@ function Packages() {
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-6">
-          <h2 className="font-display text-3xl">Washa kifurushi</h2>
+          <h2 className="font-display text-xl">Washa kifurushi</h2>
           {!user ? (
             <div className="mt-4 space-y-3">
               <p className="text-sm text-muted-foreground">Ingia kwanza ili kutuma namba ya muamala.</p>

@@ -175,7 +175,7 @@ function Admin() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="font-display text-5xl tracking-wide">Usimamizi</h1>
+      <h1 className="font-display text-3xl tracking-wide">Usimamizi</h1>
       <Tabs defaultValue="payments" className="mt-6">
         <TabsList className="h-auto flex-wrap justify-start">
           <TabsTrigger value="payments">Malipo {pending > 0 && `(${pending})`}</TabsTrigger>
@@ -229,7 +229,7 @@ function Admin() {
           </div>
           <div className="space-y-4">
           <div className="space-y-3 rounded-xl border border-border bg-card p-4">
-            <h2 className="font-display text-2xl">Ingiza M3U Playlist</h2>
+            <h2 className="font-display text-lg">Ingiza M3U Playlist</h2>
             <div className="space-y-1"><Label>Link ya playlist (.m3u)</Label>
               <div className="flex gap-2"><Input value={m3uUrl} onChange={(e) => setM3uUrl(e.target.value)} placeholder="https://…/playlist.m3u" />
               <Button type="button" disabled={m3uBusy} onClick={importFromUrl}>{m3uBusy ? "…" : "Ingiza"}</Button></div>
@@ -240,7 +240,7 @@ function Admin() {
             <div className="flex items-center gap-2"><Switch checked={m3uPremium} onCheckedChange={setM3uPremium} /><Label>{m3uPremium ? "Ziwe za kulipia" : "Ziwe bure kwa wote"}</Label></div>
           </div>
           <form onSubmit={save} className="space-y-3 rounded-xl border border-border bg-card p-4">
-            <h2 className="font-display text-2xl">{form.id ? "Hariri chaneli" : "Ongeza chaneli"}</h2>
+            <h2 className="font-display text-lg">{form.id ? "Hariri chaneli" : "Ongeza chaneli"}</h2>
             <div className="space-y-1"><Label>Jina</Label><Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
             <div className="space-y-1">
               <Label>Kundi</Label>
@@ -302,7 +302,7 @@ function Admin() {
             ))}
           </div>
           <form onSubmit={savePkg} className="space-y-3 rounded-xl border border-border bg-card p-4">
-            <h2 className="font-display text-2xl">{pf.id ? "Hariri kifurushi" : "Tengeneza kifurushi"}</h2>
+            <h2 className="font-display text-lg">{pf.id ? "Hariri kifurushi" : "Tengeneza kifurushi"}</h2>
             <div className="space-y-1"><Label>Jina</Label><Input required value={pf.label} onChange={(e) => setPf({ ...pf, label: e.target.value })} placeholder="mf. Miezi 3" /></div>
             <div className="space-y-1"><Label>Bei (TSh)</Label><Input type="number" min={1} required value={pf.price} onChange={(e) => setPf({ ...pf, price: Number(e.target.value) })} /></div>
             <div className="space-y-1"><Label>Idadi ya siku</Label><Input type="number" min={1} required value={pf.days} onChange={(e) => setPf({ ...pf, days: Number(e.target.value) })} /></div>

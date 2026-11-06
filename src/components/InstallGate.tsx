@@ -40,11 +40,11 @@ function InstallIntroduction() {
         <div className="mx-auto w-full max-w-6xl px-6 pb-10 pt-24 sm:pb-16">
           <div className="mb-8 flex items-center gap-3">
             <img src={appearance.logo_url || "/icon-192.png"} alt="" width={48} height={48} className="h-12 w-12 shrink-0 rounded-lg object-contain" />
-            <span className="min-w-0 break-words font-display text-2xl">{appearance.title}</span>
+            <span className="min-w-0 break-words font-display text-lg">{appearance.title}</span>
           </div>
           <p className="mb-3 break-words text-sm font-semibold uppercase text-accent">{appearance.tagline}</p>
-          <h1 className="max-w-xl break-words font-display text-5xl sm:text-7xl">{appearance.title}</h1>
-          <p className="mt-4 max-w-md break-words text-lg text-foreground">{appearance.description}</p>
+          <h1 className="max-w-xl break-words font-display text-3xl sm:text-5xl">{appearance.title}</h1>
+          <p className="mt-4 max-w-md break-words text-sm text-foreground">{appearance.description}</p>
           <div className="mt-7 flex flex-col items-start gap-3">
             {installed ? <p role="status" className="font-semibold text-primary">App imesakinishwa. Ifungue kupitia ikoni kwenye simu yako.</p>
               : available ? <Button className="h-auto min-h-11 max-w-full whitespace-normal py-3" size="lg" disabled={busy} onClick={startInstall}><Download className="mr-2 h-5 w-5 shrink-0" /> {busy ? "Inasakinisha…" : appearance.button_label}</Button>
@@ -57,7 +57,7 @@ function InstallIntroduction() {
       </section>
       <section className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-8">
         <Smartphone className="h-8 w-8 shrink-0 text-primary" />
-        <div><h2 className="font-display text-2xl">APP KWENYE SIMU YAKO</h2><p className="text-sm text-muted-foreground">Android au iPhone. Hakuna APK inayohitajika; kutazama kunahitaji intaneti.</p></div>
+        <div><h2 className="font-display text-lg">APP KWENYE SIMU YAKO</h2><p className="text-sm text-muted-foreground">Android au iPhone. Hakuna APK inayohitajika; kutazama kunahitaji intaneti.</p></div>
       </section>
       <section className="border-y border-border bg-card">
         <div className="mx-auto max-w-6xl px-6 py-10">
@@ -65,19 +65,19 @@ function InstallIntroduction() {
             <img src={mobileData} alt="Simu na laini za intaneti" width={1200} height={800} loading="lazy" className="absolute inset-0 -z-20 h-full w-full object-cover object-right" />
             <div className="absolute inset-0 -z-10 bg-background/60" />
             <p className="text-sm font-semibold uppercase text-accent">Vifurushi vya intaneti</p>
-            <h2 className="mt-2 font-display text-4xl sm:text-5xl">TUNAUZA PIA GB</h2>
+            <h2 className="mt-2 font-display text-2xl sm:text-3xl">TUNAUZA PIA GB</h2>
             <p className="mt-2 text-sm text-foreground">Chagua kiasi cha MB au GB unachohitaji.</p>
           </div>
           <dl className="mt-6 grid grid-cols-2 gap-x-6 sm:grid-cols-3 lg:grid-cols-4">
             {dataBundles.map(bundle => <div key={bundle.label} className="border-b border-border py-5">
-              <dt className="font-display text-3xl">{bundle.label}</dt>
+              <dt className="font-display text-xl">{bundle.label}</dt>
               <dd className="mt-1 font-semibold text-primary">TSh {bundle.price.toLocaleString("en-US")}</dd>
             </div>)}
           </dl>
         </div>
       </section>
       <section className="mx-auto max-w-6xl px-6 py-10">
-        <h2 className="font-display text-3xl">NDANI YA KASIGARA TV</h2>
+        <h2 className="font-display text-xl">NDANI YA KASIGARA TV</h2>
         <figure className="mt-4 max-w-md">
           <img src={insidePreview} alt="Muonekano wa ndani wa Kasigara TV: utafutaji, makundi na picha za chaneli" width={395} height={310} loading="lazy" className="h-auto w-full rounded-lg border border-border" />
         </figure>

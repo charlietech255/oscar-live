@@ -13,7 +13,7 @@ export function SiteHeader() {
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3">
         <Link to="/" className="flex items-center gap-2">
           <img src="/icon-192.png" alt="" width={32} height={32} className="rounded-md" />
-          <span className="font-display text-2xl tracking-wide">KASIGARA <span className="text-primary">TV</span></span>
+          <span className="font-display text-lg tracking-wide">KASIGARA <span className="text-primary">TV</span></span>
         </Link>
         <nav className="flex flex-1 flex-wrap items-center gap-4">
           <Link to="/" className={link} activeProps={active} activeOptions={{ exact: true }}>Tazama</Link>

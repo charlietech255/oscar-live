@@ -132,13 +132,13 @@ function Index() {
                 <p className="text-muted-foreground">Inapakia…</p>
               ) : !user ? (
                 <>
-                  <p className="font-display text-3xl">Jisajili upate majaribio ya bure</p>
+                  <p className="font-display text-xl">Jisajili upate majaribio ya bure</p>
                   <p className="text-muted-foreground">Masaa 24 bure — hakuna malipo kuanza.</p>
                   <Button asChild><Link to="/auth">Anza bure</Link></Button>
                 </>
               ) : (
                 <>
-                  <p className="font-display text-3xl">Muda wako umekwisha</p>
+                  <p className="font-display text-xl">Muda wako umekwisha</p>
                   <p className="text-muted-foreground">Lipia kifurushi uendelee kutazama.</p>
                   <Button asChild><Link to="/vifurushi">Angalia vifurushi</Link></Button>
                 </>
@@ -152,7 +152,7 @@ function Index() {
                   <Radio className="h-3 w-3" /> LIVE
                 </span>
               )}
-              <h1 className="font-display text-4xl tracking-wide">{current.name}</h1>
+              <h1 className="font-display text-2xl tracking-wide">{current.name}</h1>
               <span className="text-sm text-muted-foreground">{current.category}</span>
             </div>
           )}
@@ -211,8 +211,8 @@ function Index() {
                     {c.is_live && <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded bg-live px-1.5 py-0.5 text-[10px] font-bold text-destructive-foreground"><Radio className="h-3 w-3" /> LIVE</span>}
                   </div>
                   <div className="min-w-0 p-2.5">
-                    <div className="min-h-10 break-words text-sm font-semibold leading-5">{c.name}</div>
-                    <div className="text-xs text-muted-foreground">{c.category}</div>
+                    <div className="min-h-8 break-words text-xs font-semibold leading-4">{c.name}</div>
+                    <div className="text-[11px] text-muted-foreground">{c.category}</div>
                   </div>
                 </Button>
               </li>

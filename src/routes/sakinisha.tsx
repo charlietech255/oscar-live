@@ -48,7 +48,7 @@ function Install() {
       <div className="flex items-center gap-4">
         <img src="/icon-192.png" alt="Kasigara TV" width={72} height={72} className="shrink-0 rounded-lg" />
         <div className="min-w-0">
-          <h1 className="font-display text-4xl">Kasigara TV</h1>
+          <h1 className="font-display text-2xl">Kasigara TV</h1>
           <p className="text-muted-foreground">Weka app kwenye simu yako.</p>
         </div>
       </div>
@@ -66,7 +66,7 @@ function Install() {
       </Button>
       <div ref={instructions} className="mt-8 grid scroll-mt-6 gap-6 md:grid-cols-2">
         <section className="border-t border-border py-6">
-          <h2 className="flex items-center gap-2 font-display text-3xl"><Smartphone className="h-6 w-6 text-primary" /> Android</h2>
+          <h2 className="flex items-center gap-2 font-display text-xl"><Smartphone className="h-5 w-5 text-primary" /> Android</h2>
           <ol className="mt-4 space-y-3 text-sm">
             <Step n={1}>Fungua tovuti hii kwa kivinjari cha <b>Chrome</b>.</Step>
             <Step n={2}>Gusa vitone vitatu <b>⋮</b> juu kulia.</Step>
@@ -75,7 +75,7 @@ function Install() {
           </ol>
         </section>
         <section className="border-t border-border py-6">
-          <h2 className="flex items-center gap-2 font-display text-3xl"><Apple className="h-6 w-6 text-primary" /> iPhone</h2>
+          <h2 className="flex items-center gap-2 font-display text-xl"><Apple className="h-5 w-5 text-primary" /> iPhone</h2>
           <ol className="mt-4 space-y-3 text-sm">
             <Step n={1}>Fungua tovuti hii kwa <b>Safari</b>.</Step>
             <Step n={2}>Gusa kitufe cha <b>Share</b> (kisanduku chenye mshale juu) chini.</Step>

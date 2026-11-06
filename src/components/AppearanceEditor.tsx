@@ -47,7 +47,7 @@ function AppearanceForm({ initial }: { initial: Appearance }) {
   return (
     <form onSubmit={save} className="grid gap-8 lg:grid-cols-2">
       <div className="space-y-4">
-        <h2 className="font-display text-3xl">Muonekano wa nje</h2>
+        <h2 className="font-display text-xl">Muonekano wa nje</h2>
         <div><Label htmlFor="outside-title">Jina kubwa</Label><Input id="outside-title" value={form.title} onChange={e => update("title", e.target.value)} maxLength={50} /></div>
         <div><Label htmlFor="outside-tagline">Kionjo kifupi</Label><Input id="outside-tagline" value={form.tagline} onChange={e => update("tagline", e.target.value)} maxLength={100} /></div>
         <div><Label htmlFor="outside-description">Maelezo</Label><Textarea id="outside-description" value={form.description} onChange={e => update("description", e.target.value)} maxLength={500} /></div>

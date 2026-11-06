@@ -60,7 +60,7 @@ function AuthPage() {
   return (
     <main className="mx-auto max-w-md px-4 py-10">
       <div className="rounded-2xl border border-border bg-card p-6">
-        <h1 className="font-display text-4xl tracking-wide">{mode === "up" ? "Jisajili" : "Ingia"}</h1>
+        <h1 className="font-display text-2xl tracking-wide">{mode === "up" ? "Jisajili" : "Ingia"}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {mode === "up" ? "Pata masaa 24 ya kutazama bure." : "Karibu tena!"}
         </p>
