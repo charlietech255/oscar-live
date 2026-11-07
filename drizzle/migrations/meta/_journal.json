@@ -43,6 +43,13 @@
       "when": 1793942102480,
       "tag": "0005_site_appearance",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794024208923,
+      "tag": "0006_customer_controls_and_trial",
+      "breakpoints": true
     }
   ]
 }

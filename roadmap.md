@@ -1,4 +1,12 @@
 # Roadmap
+- [ ] Bottom Home / Live / Akaunti navigation and left-side secondary menu
+- [ ] Rotating outside and inside pictures with admin uploads; full-card channel images
+- [ ] Circular WhatsApp group and outside likes with persistent count
+- [ ] Twelve-minute signup trial, countdown and stop premium playback at expiry
+- [ ] Editable payment networks, package correction and manual refund record
+- [ ] Suspend/delete customers and owner administrator management
+- [ ] Verify small text, phone navigation, account and playback end-to-end
+- [ ] Installation size request: do not claim an unmeasured 18 MB download for manifest-only PWA
 - [x] Registration opens channels directly; keep phone installation available and tap-to-play cards
 - [ ] Verify real signed-in customer redirect — needs the user to sign in in preview
 - [x] Outside mobile data promotion with seven user-supplied prices

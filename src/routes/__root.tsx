@@ -18,6 +18,8 @@ import { InstallProvider } from "@/components/InstallProvider";
 import { useInstall } from "@/components/InstallProvider";
 import { InstallGate } from "@/components/InstallGate";
 import { useAuth } from "@/hooks/useAuth";
+import { BottomNavigation } from "@/components/BottomNavigation";
+import { CommunityButton } from "@/components/Community";
 
 function NotFoundComponent() {
   return (
@@ -138,7 +140,8 @@ function AppContent() {
       <InstallGate>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       {ready && (standalone || user) && <SiteHeader />}
-      <Outlet />
+       <div className="pb-24"><Outlet /></div>
+       {ready && (standalone || user) && <><BottomNavigation/><CommunityButton/></>}
       </InstallGate>
       <Toaster />
     </>

@@ -22,8 +22,10 @@ export function useAuth() {
   const profile = useQuery({
     queryKey: ["profile", user?.id],
     enabled: !!user,
+    refetchInterval: 10000,
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle();
+      if (!user) return null;
+      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
       return data;
     },
   });
@@ -32,7 +34,8 @@ export function useAuth() {
     queryKey: ["isAdmin", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase.rpc("has_role", { _user_id: user!.id, _role: "admin" });
+      if (!user) return false;
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
       return !!data;
     },
   });

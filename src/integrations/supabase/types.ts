@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit: {
+        Row: {
+          action: string
+          actor: string
+          created_at: string
+          id: string
+          note: string | null
+          target: string
+        }
+        Insert: {
+          action: string
+          actor: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          target: string
+        }
+        Update: {
+          action?: string
+          actor?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          target?: string
+        }
+        Relationships: []
+      }
+      app_likes: {
+        Row: {
+          created_at: string
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          visitor_id?: string
+        }
+        Relationships: []
+      }
+      app_owner: {
+        Row: {
+          id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       channels: {
         Row: {
           category: string
@@ -89,10 +146,42 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_networks: {
+        Row: {
+          active: boolean
+          id: string
+          name: string
+          receiving_name: string
+          receiving_number: string
+          sort_order: number
+          ussd: string
+        }
+        Insert: {
+          active?: boolean
+          id?: string
+          name: string
+          receiving_name: string
+          receiving_number: string
+          sort_order?: number
+          ussd?: string
+        }
+        Update: {
+          active?: boolean
+          id?: string
+          name?: string
+          receiving_name?: string
+          receiving_number?: string
+          sort_order?: number
+          ussd?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
+          adjustment_note: string | null
           amount: number
           created_at: string
+          granted_days: number
           id: string
           network: string
           package: string
@@ -103,8 +192,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          adjustment_note?: string | null
           amount: number
           created_at?: string
+          granted_days?: number
           id?: string
           network: string
           package: string
@@ -115,8 +206,10 @@ export type Database = {
           user_id?: string
         }
         Update: {
+          adjustment_note?: string | null
           amount?: number
           created_at?: string
+          granted_days?: number
           id?: string
           network?: string
           package?: string
@@ -134,6 +227,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          is_suspended: boolean
           subscription_ends_at: string | null
           trial_ends_at: string
         }
@@ -142,6 +236,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id: string
+          is_suspended?: boolean
           subscription_ends_at?: string | null
           trial_ends_at?: string
         }
@@ -150,6 +245,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          is_suspended?: boolean
           subscription_ends_at?: string | null
           trial_ends_at?: string
         }
@@ -159,9 +255,11 @@ export type Database = {
         Row: {
           button_label: string
           description: string
+          group_url: string
           id: string
           image_url: string | null
           logo_url: string | null
+          slides: Json
           tagline: string
           theme: string
           title: string
@@ -169,9 +267,11 @@ export type Database = {
         Insert: {
           button_label?: string
           description?: string
+          group_url?: string
           id?: string
           image_url?: string | null
           logo_url?: string | null
+          slides?: Json
           tagline?: string
           theme?: string
           title?: string
@@ -179,9 +279,11 @@ export type Database = {
         Update: {
           button_label?: string
           description?: string
+          group_url?: string
           id?: string
           image_url?: string | null
           logo_url?: string | null
+          slides?: Json
           tagline?: string
           theme?: string
           title?: string
@@ -211,6 +313,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      correct_payment: {
+        Args: {
+          _amount: number
+          _note: string
+          _package: string
+          _payment_id: string
+          _refund: boolean
+        }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -218,8 +330,21 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_app_owner: { Args: never; Returns: boolean }
+      manage_admin: {
+        Args: { _promote: boolean; _user_id: string }
+        Returns: undefined
+      }
+      outside_likes: {
+        Args: { _like?: boolean; _visitor?: string }
+        Returns: number
+      }
       review_payment: {
         Args: { _approve: boolean; _payment_id: string }
+        Returns: undefined
+      }
+      suspend_customer: {
+        Args: { _suspended: boolean; _user_id: string }
         Returns: undefined
       }
     }

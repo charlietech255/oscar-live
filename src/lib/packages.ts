@@ -16,8 +16,8 @@ export function toLoginEmail(input: string) {
   return `${digits}@simu.tv`;
 }
 
-export function hasAccess(p: { trial_ends_at: string; subscription_ends_at: string | null } | null, now = new Date()) {
-  if (!p) return false;
+export function hasAccess(p: { trial_ends_at: string; subscription_ends_at: string | null; is_suspended?: boolean } | null, now = new Date()) {
+  if (!p || p.is_suspended) return false;
   if (new Date(p.trial_ends_at) > now) return true;
   return !!p.subscription_ends_at && new Date(p.subscription_ends_at) > now;
 }

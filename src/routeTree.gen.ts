@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AkauntiRouteImport } from './routes/akaunti'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as LiveRouteImport } from './routes/live'
 import { Route as SakinishaRouteImport } from './routes/sakinisha'
 import { Route as VifurushiRouteImport } from './routes/vifurushi'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -25,9 +27,19 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AkauntiRoute = AkauntiRouteImport.update({
+  id: '/akaunti',
+  path: '/akaunti',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveRoute = LiveRouteImport.update({
+  id: '/live',
+  path: '/live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SakinishaRoute = SakinishaRouteImport.update({
@@ -48,14 +60,18 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/akaunti': typeof AkauntiRoute
   '/auth': typeof AuthRoute
+  '/live': typeof LiveRoute
   '/sakinisha': typeof SakinishaRoute
   '/vifurushi': typeof VifurushiRoute
   '/admin': typeof AuthenticatedAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/akaunti': typeof AkauntiRoute
   '/auth': typeof AuthRoute
+  '/live': typeof LiveRoute
   '/sakinisha': typeof SakinishaRoute
   '/vifurushi': typeof VifurushiRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -64,21 +80,39 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/akaunti': typeof AkauntiRoute
   '/auth': typeof AuthRoute
+  '/live': typeof LiveRoute
   '/sakinisha': typeof SakinishaRoute
   '/vifurushi': typeof VifurushiRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/sakinisha' | '/vifurushi' | '/admin'
+  fullPaths:
+    | '/'
+    | '/akaunti'
+    | '/auth'
+    | '/live'
+    | '/sakinisha'
+    | '/vifurushi'
+    | '/admin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/sakinisha' | '/vifurushi' | '/admin'
+  to:
+    | '/'
+    | '/akaunti'
+    | '/auth'
+    | '/live'
+    | '/sakinisha'
+    | '/vifurushi'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/akaunti'
     | '/auth'
+    | '/live'
     | '/sakinisha'
     | '/vifurushi'
     | '/_authenticated/admin'
@@ -87,7 +121,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AkauntiRoute: typeof AkauntiRoute
   AuthRoute: typeof AuthRoute
+  LiveRoute: typeof LiveRoute
   SakinishaRoute: typeof SakinishaRoute
   VifurushiRoute: typeof VifurushiRoute
 }
@@ -108,11 +144,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/akaunti': {
+      id: '/akaunti'
+      path: '/akaunti'
+      fullPath: '/akaunti'
+      preLoaderRoute: typeof AkauntiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live': {
+      id: '/live'
+      path: '/live'
+      fullPath: '/live'
+      preLoaderRoute: typeof LiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sakinisha': {
@@ -153,7 +203,9 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AkauntiRoute: AkauntiRoute,
   AuthRoute: AuthRoute,
+  LiveRoute: LiveRoute,
   SakinishaRoute: SakinishaRoute,
   VifurushiRoute: VifurushiRoute,
 }

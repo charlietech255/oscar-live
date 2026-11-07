@@ -1,0 +1,17 @@
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { deleteCustomer } from "@/lib/customer-admin.functions";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+export function CustomerManagement({administrators=false}:{administrators?:boolean}) {
+ const {isAdmin}=useAuth();const qc=useQueryClient();const remove=useServerFn(deleteCustomer);const [q,setQ]=useState("");const [busy,setBusy]=useState(false);
+ const users=useQuery({queryKey:["allUsers"],enabled:isAdmin,queryFn:async()=>{const {data,error}=await supabase.from("profiles").select("*").order("created_at");if(error)throw error;return data;}});
+ const roles=useQuery({queryKey:["allRoles"],enabled:isAdmin,queryFn:async()=>{const {data,error}=await supabase.from("user_roles").select("*");if(error)throw error;return data;}});
+ const owner=useQuery({queryKey:["isOwner"],enabled:isAdmin,queryFn:async()=>{const {data,error}=await supabase.rpc("is_app_owner");if(error)throw error;return data;}});
+ async function act(action:()=>Promise<unknown>){setBusy(true);try{await action();toast.success("Mabadiliko yamehifadhiwa");await qc.invalidateQueries({queryKey:["allUsers"]});await qc.invalidateQueries({queryKey:["allRoles"]});await qc.invalidateQueries({queryKey:["profile"]});}catch(e){toast.error(e instanceof Error?e.message:"Haijakamilika");}finally{setBusy(false);}}
+ return <section><h2 className="font-display text-xl">{administrators?"Wasimamizi":"Watumiaji"}</h2><Input className="my-4" placeholder="Tafuta jina au simu…" value={q} onChange={e=>setQ(e.target.value)}/>{(users.isError||roles.isError)&&<p className="text-destructive">Orodha haijapakiwa.</p>}<ul className="space-y-2">{users.data?.filter(u=>`${u.display_name} ${u.contact}`.toLowerCase().includes(q.toLowerCase())).map(u=>{const admin=roles.data?.some(r=>r.user_id===u.id&&r.role==="admin");return <li key={u.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4"><div className="min-w-0 flex-1"><p className="break-words font-semibold">{u.display_name} {admin&&"· Msimamizi"}</p><p className="break-words text-xs text-muted-foreground">{u.contact}</p>{u.is_suspended&&<p className="text-xs text-destructive">Imesimamishwa</p>}</div>{administrators?owner.data&&<Button size="sm" variant={admin?"secondary":"default"} disabled={busy} onClick={()=>{if(!confirm(admin?"Ondoa usimamizi wa akaunti hii?":"Mpe uwezo wa usimamizi?"))return;void act(async()=>{const {error}=await supabase.rpc("manage_admin",{_user_id:u.id,_promote:!admin});if(error)throw error;});}}>{admin?"Ondoa usimamizi":"Mpe usimamizi"}</Button>:!admin&&<><Button size="sm" variant="secondary" disabled={busy} onClick={()=>void act(async()=>{const {error}=await supabase.rpc("suspend_customer",{_user_id:u.id,_suspended:!u.is_suspended});if(error)throw error;})}>{u.is_suspended?"Ruhusu":"Simamisha"}</Button>{owner.data&&<Button size="sm" variant="destructive" disabled={busy} onClick={()=>{if(confirm(`Futa akaunti ya ${u.display_name}? Haiwezi kurudishwa.`))void act(()=>remove({data:{userId:u.id}}));}}>Futa</Button>}</>}</li>;})}</ul>{administrators&&!owner.data&&<p className="mt-4 text-muted-foreground">Mmiliki pekee anaweza kuongeza au kuondoa wasimamizi.</p>}</section>;
+}

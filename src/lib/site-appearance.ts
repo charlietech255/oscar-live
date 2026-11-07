@@ -5,6 +5,8 @@ export const defaultAppearance = {
   id: "main", title: "KASIGARA TV", tagline: "Mpira · TV · Burudani",
   description: "Mechi na burudani kwenye simu yako. Jisajili, chagua chaneli na uguse picha yake kuanza kutazama. Unaweza pia kusakinisha app kwenye simu.",
   button_label: "Sakinisha app", image_url: null as string | null, logo_url: null as string | null, theme: "green",
+  slides: [] as import("@/integrations/supabase/types").Json,
+  group_url: "https://chat.whatsapp.com/KxKzfO4MsaY2YmAjQD526L?s=cl&p=a&iam=2",
 };
 export type Appearance = typeof defaultAppearance;
 export const appearanceOptions = queryOptions({

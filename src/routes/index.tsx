@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Radio, Lock, Sparkles, Play } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { aiFindChannels, type AiSearchResult } from "@/lib/ai-search.functions";
@@ -12,6 +12,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { CATEGORIES, hasAccess } from "@/lib/packages";
 import { cn } from "@/lib/utils";
 import channelCover from "@/assets/channel-cover.jpg";
+import { Showcase } from "@/components/Showcase";
+import { trialSeconds } from "@/lib/customer-controls";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,7 +29,8 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-function Index() {
+function Index() { return <ChannelScreen/>; }
+export function ChannelScreen({liveOnly=false}:{liveOnly?:boolean}) {
   const { user, ready, profile } = useAuth();
   const [cat, setCat] = useState<string>("Zote");
   const [q, setQ] = useState("");
@@ -38,6 +41,8 @@ function Index() {
   const findFn = useServerFn(aiFindChannels);
   const playerRef = useRef<HTMLElement>(null);
   const [foundName, setFoundName] = useState<string | null>(null);
+  const [now,setNow] = useState(()=>Date.now());
+  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),1000);return ()=>clearInterval(timer);},[]);
 
   const { data: channels = [], isLoading } = useQuery({
     queryKey: ["channels"],
@@ -49,11 +54,11 @@ function Index() {
   });
 
   const filtered = useMemo(
-    () => channels.filter((c) => (cat === "Zote" || c.category === cat) && c.name.toLowerCase().includes(q.toLowerCase())),
-    [channels, cat, q],
+    () => channels.filter((c) => (!liveOnly||c.is_live) && (cat === "Zote" || c.category === cat) && c.name.toLowerCase().includes(q.toLowerCase())),
+    [channels, cat, q, liveOnly],
   );
-  const current = channels.find((c) => c.id === selectedId) ?? channels[0];
-  const access = !!current && (!current.is_premium || hasAccess(profile));
+  const current = channels.find((c) => c.id === selectedId) ?? (liveOnly?channels.find(c=>c.is_live):channels[0]);
+  const access = !!current && !profile?.is_suspended && (!current.is_premium || hasAccess(profile,new Date(now)));
   const shownChannels = ai?.ids.length
     ? ai.ids.flatMap((id) => { const channel = channels.find((c) => c.id === id); return channel ? [channel] : []; })
     : filtered;
@@ -88,12 +93,12 @@ function Index() {
     }
   }
 
-  const trialLeft = profile && new Date(profile.trial_ends_at) > new Date()
-    ? Math.ceil((new Date(profile.trial_ends_at).getTime() - Date.now()) / 3600000)
-    : 0;
+  const trialLeft = trialSeconds(profile?.trial_ends_at,now);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6">
+      <Showcase/>
+      {user && trialLeft>0 && !hasAccess(profile?.subscription_ends_at?{trial_ends_at:"1970-01-01",subscription_ends_at:profile.subscription_ends_at}:null,new Date(now)) && <p role="timer" className="mb-4 text-xs font-semibold text-primary">Ofa ya bure · {Math.floor(trialLeft/60)}:{String(trialLeft%60).padStart(2,"0")}</p>}
       <form
         onSubmit={(e) => { e.preventDefault(); runAi(aiQ); }}
         className="mb-5 rounded-xl border border-accent/40 bg-accent/5 p-3"
@@ -130,10 +135,10 @@ function Index() {
               <Lock className="h-10 w-10 text-primary" />
               {!ready || isLoading ? (
                 <p className="text-muted-foreground">Inapakia…</p>
-              ) : !user ? (
+              ) : profile?.is_suspended ? (<p>Akaunti yako imesimamishwa. Wasiliana na msimamizi.</p>) : !user ? (
                 <>
                   <p className="font-display text-xl">Jisajili upate majaribio ya bure</p>
-                  <p className="text-muted-foreground">Masaa 24 bure — hakuna malipo kuanza.</p>
+                  <p className="text-muted-foreground">Dakika 12 bure — hakuna malipo kuanza.</p>
                   <Button asChild><Link to="/auth">Anza bure</Link></Button>
                 </>
               ) : (
@@ -159,7 +164,7 @@ function Index() {
           {current?.description && <p className="mt-1 text-muted-foreground">{current.description}</p>}
           {user && trialLeft > 0 && !profile?.subscription_ends_at && (
             <p className="mt-4 rounded-lg border border-accent/40 bg-accent/10 p-3 text-sm">
-              Uko kwenye majaribio ya bure — yamebaki takriban masaa {trialLeft}.{" "}
+              Ofa yako inaisha baada ya dakika {Math.floor(trialLeft/60)} na sekunde {trialLeft%60}.{" "}
               <Link to="/vifurushi" className="font-semibold text-accent underline">Lipia kifurushi</Link>
             </p>
           )}
@@ -203,7 +208,7 @@ function Index() {
                   )}
                 >
                   <div className="relative aspect-video w-full overflow-hidden bg-secondary">
-                    <img src={c.logo_url || channelCover} alt="" className={cn("h-full w-full", c.logo_url ? "object-contain p-3" : "object-cover")} loading="lazy" width={384} height={216} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = channelCover; }} />
+                    <img src={c.logo_url || channelCover} alt="" className="h-full w-full object-cover" loading="lazy" width={384} height={216} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = channelCover; }} />
                     <span className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-background/85 text-primary">
                       {c.is_premium && !hasAccess(profile) ? <Lock className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
                     </span>

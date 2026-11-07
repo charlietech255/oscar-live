@@ -11,6 +11,9 @@ import { dataBundles } from "@/lib/data-bundles";
 import { useQuery } from "@tanstack/react-query";
 import { appearanceOptions, defaultAppearance } from "@/lib/site-appearance";
 import { useAuth } from "@/hooks/useAuth";
+import { RotatingPictures } from "@/components/Showcase";
+import { defaultSlides, readSlides } from "@/lib/showcase";
+import { CommunityButton, OutsideLikes } from "@/components/Community";
 
 export function InstallGate({ children }: { children: ReactNode }) {
   const { ready, standalone } = useInstall();
@@ -26,6 +29,8 @@ function InstallIntroduction() {
   const { available, installed, busy, install } = useInstall();
   const [message, setMessage] = useState("");
   const { data: appearance = defaultAppearance } = useQuery(appearanceOptions);
+  const savedSlides=readSlides(appearance.slides);
+  const slides=savedSlides.length?savedSlides:appearance.image_url?[{image:appearance.image_url,title:appearance.title},...defaultSlides]:defaultSlides;
   async function startInstall() {
     const outcome = await install();
     setMessage(outcome === "accepted"
@@ -35,7 +40,7 @@ function InstallIntroduction() {
   return (
     <main className={`install-theme-${appearance.theme}`}>
       <section className="relative isolate flex min-h-[560px] items-end overflow-hidden bg-background sm:min-h-[620px]">
-        <img src={appearance.image_url || stadium} alt="Picha ya Kasigara TV" width={1536} height={1024} className="absolute inset-0 -z-20 h-full w-full object-cover object-[65%_center] sm:object-center" />
+        <RotatingPictures slides={slides} background/>
         <div className="absolute inset-0 -z-10 bg-background/50" />
         <div className="mx-auto w-full max-w-6xl px-6 pb-10 pt-24 sm:pb-16">
           <div className="mb-8 flex items-center gap-3">
@@ -51,6 +56,7 @@ function InstallIntroduction() {
               : <Button className="h-auto min-h-11 max-w-full whitespace-normal py-3" size="lg" asChild><Link to="/sakinisha"><Download className="mr-2 h-5 w-5 shrink-0" /> {appearance.button_label}</Link></Button>}
             <Button asChild variant="link" className="h-auto px-0 text-foreground"><Link to="/sakinisha">Hatua za Android na iPhone <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
             <Button asChild variant="outline"><Link to="/auth"><UserPlus className="mr-2 h-4 w-4" /> Jisajili / Ingia</Link></Button>
+            <OutsideLikes/>
             {message && <p role="status" className="max-w-md text-sm text-primary">{message}</p>}
           </div>
         </div>
@@ -82,6 +88,7 @@ function InstallIntroduction() {
           <img src={insidePreview} alt="Muonekano wa ndani wa Kasigara TV: utafutaji, makundi na picha za chaneli" width={395} height={310} loading="lazy" className="h-auto w-full rounded-lg border border-border" />
         </figure>
       </section>
+      <CommunityButton/>
     </main>
   );
 }
