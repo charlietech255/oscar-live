@@ -74,7 +74,7 @@ export function LiveComments() {
     const author = (profile as { full_name?: string | null } | null)?.full_name || user!.email?.split("@")[0] || "Shabiki";
     const { error } = await supabase.from("match_comments").insert({ body: body.slice(0, 200), author: author.slice(0, 40), user_id: user!.id });
     setBusy(false);
-    if (error) return toast.error("Maoni hayakutumwa.");
+    if (error) { toast.error("Maoni hayakutumwa."); return; }
     setText("");
     qc.invalidateQueries({ queryKey: ["match_comments"] });
   }
@@ -105,7 +105,7 @@ export function MatchEditor() {
   const num = (k: string) => <Input type="number" min={0} max={99} value={String(f[k])} onChange={(e) => set(k, Math.max(0, Math.min(99, Number(e.target.value) || 0)))} />;
   async function save() {
     const { error } = await supabase.from("match_day").update(f as never).eq("id", "main");
-    if (error) return toast.error("Imeshindikana kuhifadhi mechi.");
+    if (error) { toast.error("Imeshindikana kuhifadhi mechi."); return; }
     toast.success("Mechi imehifadhiwa.");
     setForm(null);
     qc.invalidateQueries({ queryKey: ["match_day"] });
@@ -113,15 +113,15 @@ export function MatchEditor() {
   const pairs: [string, string, string][] = [["Magoli", "home_score", "away_score"], ["Mashuti", "home_shots", "away_shots"], ["Kadi za njano", "home_yellow", "away_yellow"], ["Kona", "home_corners", "away_corners"]];
   return (
     <div className="max-w-xl space-y-3 rounded-xl border border-border bg-card p-4">
-      <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={Boolean(f.visible)} onChange={(e) => set("visible", e.target.checked)} /> Onyesha ubao wa mechi na takwimu</label>
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={Boolean(f["visible"])} onChange={(e) => set("visible", e.target.checked)} /> Onyesha ubao wa mechi na takwimu</label>
       <div className="grid grid-cols-2 gap-2">
-        <Input value={String(f.home)} maxLength={30} onChange={(e) => set("home", e.target.value)} placeholder="Timu ya nyumbani" />
-        <Input value={String(f.away)} maxLength={30} onChange={(e) => set("away", e.target.value)} placeholder="Timu ya ugenini" />
-        <Input value={String(f.minute)} maxLength={10} onChange={(e) => set("minute", e.target.value)} placeholder="Dakika (74:12)" />
-        <Input value={String(f.competition)} maxLength={40} onChange={(e) => set("competition", e.target.value)} placeholder="Ligi" />
+        <Input value={String(f["home"])} maxLength={30} onChange={(e) => set("home", e.target.value)} placeholder="Timu ya nyumbani" />
+        <Input value={String(f["away"])} maxLength={30} onChange={(e) => set("away", e.target.value)} placeholder="Timu ya ugenini" />
+        <Input value={String(f["minute"])} maxLength={10} onChange={(e) => set("minute", e.target.value)} placeholder="Dakika (74:12)" />
+        <Input value={String(f["competition"])} maxLength={40} onChange={(e) => set("competition", e.target.value)} placeholder="Ligi" />
       </div>
       {pairs.map(([l, a, b]) => <div key={l}><p className="text-xs text-muted-foreground">{l} (nyumbani / ugenini)</p><div className="grid grid-cols-2 gap-2">{num(a)}{num(b)}</div></div>)}
-      <div><p className="text-xs text-muted-foreground">Umiliki wa mpira wa timu ya nyumbani (%)</p><Input type="number" min={0} max={100} value={String(f.possession)} onChange={(e) => set("possession", Math.max(0, Math.min(100, Number(e.target.value) || 0)))} /></div>
+      <div><p className="text-xs text-muted-foreground">Umiliki wa mpira wa timu ya nyumbani (%)</p><Input type="number" min={0} max={100} value={String(f["possession"])} onChange={(e) => set("possession", Math.max(0, Math.min(100, Number(e.target.value) || 0)))} /></div>
       <Button onClick={save}>Hifadhi mechi</Button>
     </div>
   );
