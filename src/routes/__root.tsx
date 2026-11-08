@@ -133,7 +133,7 @@ function RootComponent() {
 }
 
 function AppContent() {
-  const { ready, standalone } = useInstall();
+  const { ready } = useInstall();
   const { user } = useAuth();
   return (
     <>
