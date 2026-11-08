@@ -139,9 +139,9 @@ function AppContent() {
     <>
       <InstallGate>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      {ready && (standalone || user) && <SiteHeader />}
+      {ready && user && <SiteHeader />}
        <div className="pb-24"><Outlet /></div>
-       {ready && (standalone || user) && <><BottomNavigation/><CommunityButton/></>}
+       {ready && user && <><BottomNavigation/><CommunityButton/></>}
       </InstallGate>
       <Toaster />
     </>
