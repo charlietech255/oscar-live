@@ -129,7 +129,12 @@ export function ChannelScreen({liveOnly=false}:{liveOnly?:boolean}) {
             <p className="mb-2 rounded-lg bg-primary/15 px-3 py-2 text-sm font-semibold text-primary">Tumekupatia: {foundName} — inacheza sasa!</p>
           )}
           {current && access ? (
-            <HlsPlayer key={current.id} src={current.stream_url} />
+            <div className="relative">
+              <HlsPlayer key={current.id} src={current.stream_url} />
+              <span className={cn("pointer-events-none absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-bold", current.is_live ? "bg-live text-destructive-foreground" : "bg-secondary text-secondary-foreground")}>
+                {current.is_live ? <><span className="h-2 w-2 animate-pulse rounded-full bg-destructive-foreground" /> LIVE</> : "HAIPO LIVE (MARUDIO)"}
+              </span>
+            </div>
           ) : (
             <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-6 text-center">
               <Lock className="h-10 w-10 text-primary" />

@@ -56,7 +56,7 @@ function Install() {
         <p role="status" className="mt-6 flex items-center gap-2 text-primary"><CheckCircle2 className="h-5 w-5" /> App tayari ipo kwenye simu yako.</p>
       ) : (
         <Button className="mt-6 w-full sm:w-auto" size="lg" disabled={busy} onClick={handleInstall}>
-          <Download className="mr-2 h-5 w-5" /> {busy ? "Inasakinisha…" : "Sakinisha kwenye simu"}
+          <Download className="mr-2 h-5 w-5" /> {busy ? "Inasakinisha…" : "Sakinisha kwenye simu (MB 18 tu)"}
         </Button>
       )}
       <p className="mt-3 text-sm text-muted-foreground">Hakuna faili la APK linalohitajika. App itaonekana kama ikoni kwenye skrini ya simu; kutazama video kunahitaji intaneti.</p>

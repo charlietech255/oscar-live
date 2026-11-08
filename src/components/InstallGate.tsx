@@ -54,6 +54,7 @@ function InstallIntroduction() {
             {installed ? <p role="status" className="font-semibold text-primary">App imesakinishwa. Ifungue kupitia ikoni kwenye simu yako.</p>
               : available ? <Button className="h-auto min-h-11 max-w-full whitespace-normal py-3" size="lg" disabled={busy} onClick={startInstall}><Download className="mr-2 h-5 w-5 shrink-0" /> {busy ? "Inasakinisha…" : appearance.button_label}</Button>
               : <Button className="h-auto min-h-11 max-w-full whitespace-normal py-3" size="lg" asChild><Link to="/sakinisha"><Download className="mr-2 h-5 w-5 shrink-0" /> {appearance.button_label}</Link></Button>}
+            <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">App ni nyepesi: MB 18 tu</span>
             <Button asChild variant="link" className="h-auto px-0 text-foreground"><Link to="/sakinisha">Hatua za Android na iPhone <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
             <Button asChild variant="outline"><Link to="/auth"><UserPlus className="mr-2 h-4 w-4" /> Jisajili / Ingia</Link></Button>
             <OutsideLikes/>
