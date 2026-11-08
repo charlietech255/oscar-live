@@ -15,6 +15,7 @@ import { parseM3U, guessCategory } from "@/lib/m3u";
 import { CATEGORIES, formatTsh, hasAccess, validatePackage } from "@/lib/packages";
 import { prepareChannelLogo } from "@/lib/channel-logo";
 import { AppearanceEditor } from "@/components/AppearanceEditor";
+import { MatchEditor } from "@/components/MatchCenter";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -183,7 +184,9 @@ function Admin() {
           <TabsTrigger value="packages">Vifurushi</TabsTrigger>
           <TabsTrigger value="users">Watumiaji</TabsTrigger>
           <TabsTrigger value="appearance">Muonekano wa nje</TabsTrigger>
+          <TabsTrigger value="match">Mechi ya leo</TabsTrigger>
         </TabsList>
+        <TabsContent value="match" className="mt-4"><MatchEditor /></TabsContent>
 
         <TabsContent value="payments" className="mt-4 space-y-2">
           {payments.data?.length === 0 && <p className="text-muted-foreground">Hakuna malipo bado.</p>}

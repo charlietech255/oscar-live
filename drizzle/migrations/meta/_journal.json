@@ -50,6 +50,13 @@
       "when": 1794024208923,
       "tag": "0006_customer_controls_and_trial",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794096315027,
+      "tag": "0007_match_day_and_comments",
+      "breakpoints": true
     }
   ]
 }

@@ -110,6 +110,84 @@ export type Database = {
         }
         Relationships: []
       }
+      match_comments: {
+        Row: {
+          author: string
+          body: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          author: string
+          body: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Update: {
+          author?: string
+          body?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      match_day: {
+        Row: {
+          away: string
+          away_corners: number
+          away_score: number
+          away_shots: number
+          away_yellow: number
+          competition: string
+          home: string
+          home_corners: number
+          home_score: number
+          home_shots: number
+          home_yellow: number
+          id: string
+          minute: string
+          possession: number
+          visible: boolean
+        }
+        Insert: {
+          away?: string
+          away_corners?: number
+          away_score?: number
+          away_shots?: number
+          away_yellow?: number
+          competition?: string
+          home?: string
+          home_corners?: number
+          home_score?: number
+          home_shots?: number
+          home_yellow?: number
+          id?: string
+          minute?: string
+          possession?: number
+          visible?: boolean
+        }
+        Update: {
+          away?: string
+          away_corners?: number
+          away_score?: number
+          away_shots?: number
+          away_yellow?: number
+          competition?: string
+          home?: string
+          home_corners?: number
+          home_score?: number
+          home_shots?: number
+          home_yellow?: number
+          id?: string
+          minute?: string
+          possession?: number
+          visible?: boolean
+        }
+        Relationships: []
+      }
       packages: {
         Row: {
           active: boolean

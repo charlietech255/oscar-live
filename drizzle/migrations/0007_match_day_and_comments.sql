@@ -1,0 +1,16 @@
+CREATE TABLE public.match_day (id text PRIMARY KEY DEFAULT 'main' CHECK (id='main'), visible boolean NOT NULL DEFAULT true, home text NOT NULL DEFAULT 'YANGA', away text NOT NULL DEFAULT 'SIMBA', home_score int NOT NULL DEFAULT 0 CHECK (home_score BETWEEN 0 AND 99), away_score int NOT NULL DEFAULT 0 CHECK (away_score BETWEEN 0 AND 99), minute text NOT NULL DEFAULT '00:00', competition text NOT NULL DEFAULT 'Ligi Kuu', possession int NOT NULL DEFAULT 50 CHECK (possession BETWEEN 0 AND 100), home_shots int NOT NULL DEFAULT 0, away_shots int NOT NULL DEFAULT 0, home_yellow int NOT NULL DEFAULT 0, away_yellow int NOT NULL DEFAULT 0, home_corners int NOT NULL DEFAULT 0, away_corners int NOT NULL DEFAULT 0, CHECK (char_length(home) BETWEEN 1 AND 30), CHECK (char_length(away) BETWEEN 1 AND 30), CHECK (char_length(minute) <= 10), CHECK (char_length(competition) <= 40));
+GRANT SELECT ON public.match_day TO anon;
+GRANT SELECT, INSERT, UPDATE ON public.match_day TO authenticated;
+GRANT ALL ON public.match_day TO service_role;
+ALTER TABLE public.match_day ENABLE ROW LEVEL SECURITY;
+CREATE POLICY match_public_read ON public.match_day FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY match_admin_insert ON public.match_day FOR INSERT TO authenticated WITH CHECK (public.has_role(auth.uid(),'admin'));
+CREATE POLICY match_admin_update ON public.match_day FOR UPDATE TO authenticated USING (public.has_role(auth.uid(),'admin')) WITH CHECK (public.has_role(auth.uid(),'admin'));
+INSERT INTO public.match_day (id) VALUES ('main') ON CONFLICT DO NOTHING;
+CREATE TABLE public.match_comments (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL DEFAULT auth.uid(), author text NOT NULL, body text NOT NULL CHECK (char_length(body) BETWEEN 1 AND 200), created_at timestamptz NOT NULL DEFAULT now(), CHECK (char_length(author) BETWEEN 1 AND 40));
+GRANT SELECT, INSERT, DELETE ON public.match_comments TO authenticated;
+GRANT ALL ON public.match_comments TO service_role;
+ALTER TABLE public.match_comments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY comments_read ON public.match_comments FOR SELECT TO authenticated USING (true);
+CREATE POLICY comments_insert_own ON public.match_comments FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid());
+CREATE POLICY comments_admin_delete ON public.match_comments FOR DELETE TO authenticated USING (public.has_role(auth.uid(),'admin') OR user_id = auth.uid());

@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import channelCover from "@/assets/channel-cover.jpg";
 import { Showcase } from "@/components/Showcase";
 import { trialSeconds } from "@/lib/customer-controls";
+import { Scoreboard, MatchStats, LiveComments } from "@/components/MatchCenter";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -131,6 +132,7 @@ export function ChannelScreen({liveOnly=false}:{liveOnly?:boolean}) {
           {current && access ? (
             <div className="relative">
               <HlsPlayer key={current.id} src={current.stream_url} />
+              <Scoreboard />
               <span className={cn("pointer-events-none absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-bold", current.is_live ? "bg-live text-destructive-foreground" : "bg-secondary text-secondary-foreground")}>
                 {current.is_live ? <><span className="h-2 w-2 animate-pulse rounded-full bg-destructive-foreground" /> LIVE</> : "HAIPO LIVE (MARUDIO)"}
               </span>
@@ -167,6 +169,8 @@ export function ChannelScreen({liveOnly=false}:{liveOnly?:boolean}) {
             </div>
           )}
           {current?.description && <p className="mt-1 text-muted-foreground">{current.description}</p>}
+          <MatchStats />
+          <LiveComments />
           {user && trialLeft > 0 && !profile?.subscription_ends_at && (
             <p className="mt-4 rounded-lg border border-accent/40 bg-accent/10 p-3 text-sm">
               Ofa yako inaisha baada ya dakika {Math.floor(trialLeft/60)} na sekunde {trialLeft%60}.{" "}
