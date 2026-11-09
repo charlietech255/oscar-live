@@ -1,3 +1,4 @@
+import { useAppSettings } from "@/components/AppSettingsProvider";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/vifurushi")({
 const statusLabel: Record<string, string> = { pending: "Inasubiri uthibitisho", approved: "Imethibitishwa", rejected: "Imekataliwa" };
 
 function Packages() {
+  const { t } = useAppSettings();
   const { user } = useAuth();
   const qc = useQueryClient();
   const { data: PACKAGES = [] } = usePackages();
@@ -62,8 +64,8 @@ function Packages() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="font-display text-3xl tracking-wide">Vifurushi</h1>
-      <p className="text-muted-foreground">Chagua kifurushi, lipia, kisha tuma namba ya muamala.</p>
+      <h1 className="font-display text-3xl tracking-wide">{t("Vifurushi")}</h1>
+      <p className="text-muted-foreground">{t("Chagua kifurushi, lipia, kisha tuma namba ya muamala.")}</p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {PACKAGES.map((p) => (
@@ -82,15 +84,15 @@ function Packages() {
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         <section className="rounded-2xl border border-border bg-card p-6">
-          <h2 className="font-display text-xl">Jinsi ya kulipia</h2>
+          <h2 className="font-display text-xl">{t("Jinsi ya kulipia")}</h2>
           <ol className="mt-4 space-y-3 text-sm">
             {[
-              <>Piga <b>*150*00#</b> (M-Pesa) au <b>*150*01#</b> (Tigo Pesa / Mixx)</>,
-              <>Chagua <b>Tuma Pesa</b></>,
-              <>Weka namba <b>{PAY_NUMBER}</b> — jina litaonekana <b>{PAY_NAME}</b></>,
-              <>Kiasi: <b>{chosen ? formatTsh(chosen.price) : "—"}</b> ({chosen?.label})</>,
-              <>Weka namba yako ya siri na thibitisha</>,
-              <>Nakili <b>kumbukumbu ya muamala</b> kutoka kwenye SMS na uitume hapa</>,
+              <>{t("Piga") + " "}<b>*150*00#</b>{" " + t("(M-Pesa) au") + " "}<b>*150*01#</b>{" " + t("(Tigo Pesa / Mixx)")}</>,
+              <>{t("Chagua") + " "}<b>{t("Tuma Pesa")}</b></>,
+              <>{t("Weka namba") + " "}<b>{PAY_NUMBER}</b>{" " + t("— jina litaonekana") + " "}<b>{PAY_NAME}</b></>,
+              <>{t("Kiasi:") + " "}<b>{chosen ? formatTsh(chosen.price) : "—"}</b> ({chosen?.label})</>,
+              <>{t("Weka namba yako ya siri na thibitisha")}</>,
+              <>{t("Nakili") + " "}<b>{t("kumbukumbu ya muamala")}</b>{" " + t("kutoka kwenye SMS na uitume hapa")}</>,
             ].map((t, i) => (
               <li key={i} className="flex gap-3">
                 <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{i + 1}</span>
@@ -99,21 +101,21 @@ function Packages() {
             ))}
           </ol>
           <Button variant="secondary" className="mt-5" onClick={() => { navigator.clipboard.writeText(PAY_NUMBER); toast.success("Namba imenakiliwa"); }}>
-            <Copy className="mr-2 h-4 w-4" /> Nakili {PAY_NUMBER}
+            <Copy className="mr-2 h-4 w-4" />{" " + t("Nakili") + " "}{PAY_NUMBER}
           </Button>
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-6">
-          <h2 className="font-display text-xl">Washa kifurushi</h2>
+          <h2 className="font-display text-xl">{t("Washa kifurushi")}</h2>
           {!user ? (
             <div className="mt-4 space-y-3">
-              <p className="text-sm text-muted-foreground">Ingia kwanza ili kutuma namba ya muamala.</p>
-              <Button asChild><Link to="/auth">Ingia / Jisajili</Link></Button>
+              <p className="text-sm text-muted-foreground">{t("Ingia kwanza ili kutuma namba ya muamala.")}</p>
+              <Button asChild><Link to="/auth">{t("Ingia / Jisajili")}</Link></Button>
             </div>
           ) : (
             <form onSubmit={submit} className="mt-4 space-y-4">
               <div className="space-y-1">
-                <Label>Mtandao</Label>
+                <Label>{t("Mtandao")}</Label>
                 <div className="flex gap-2">
                   {["M-Pesa", "Tigo Pesa"].map((n) => (
                     <Button key={n} type="button" variant={network === n ? "default" : "secondary"} onClick={() => setNetwork(n)}>{n}</Button>
@@ -121,21 +123,21 @@ function Packages() {
                 </div>
               </div>
               <div className="space-y-1">
-                <Label htmlFor="phone">Namba uliyolipia nayo</Label>
+                <Label htmlFor="phone">{t("Namba uliyolipia nayo")}</Label>
                 <Input id="phone" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07XXXXXXXX" />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="ref">Kumbukumbu / Namba ya muamala</Label>
-                <Input id="ref" required value={reference} onChange={(e) => setReference(e.target.value)} placeholder="mf. QK12AB34CD" />
+                <Label htmlFor="ref">{t("Kumbukumbu / Namba ya muamala")}</Label>
+                <Input id="ref" required value={reference} onChange={(e) => setReference(e.target.value)} placeholder={t("mf. QK12AB34CD")} />
               </div>
               <Button type="submit" className="w-full" disabled={busy || !chosen}>
-                {busy ? "Inatuma…" : chosen ? `Tuma — ${chosen.label} (${formatTsh(chosen.price)})` : "Tuma"}
+                {busy ? "Inatuma…" : chosen ? `Tuma — ${chosen.label} (${formatTsh(chosen.price)})` : t("Tuma")}
               </Button>
             </form>
           )}
           {history.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-sm font-semibold">Malipo yako</h3>
+              <h3 className="text-sm font-semibold">{t("Malipo yako")}</h3>
               <ul className="mt-2 space-y-2 text-sm">
                 {history.map((h) => (
                   <li key={h.id} className="flex items-center justify-between rounded-lg bg-secondary px-3 py-2">

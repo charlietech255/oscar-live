@@ -1,3 +1,4 @@
+import { useAppSettings } from "@/components/AppSettingsProvider";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
+  const { t } = useAppSettings();
   const [mode, setMode] = useState<"in" | "up">("up");
   const [contact, setContact] = useState("");
   const [name, setName] = useState("");
@@ -60,33 +62,33 @@ function AuthPage() {
   return (
     <main className="mx-auto max-w-md px-4 py-10">
       <div className="rounded-2xl border border-border bg-card p-6">
-        <h1 className="font-display text-2xl tracking-wide">{mode === "up" ? "Jisajili" : "Ingia"}</h1>
+        <h1 className="font-display text-2xl tracking-wide">{mode === "up" ? t("Jisajili") : t("Ingia")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {mode === "up" ? "Pata dakika 12 za kutazama bure." : "Karibu tena!"}
+          {mode === "up" ? t("Pata dakika 12 za kutazama bure.") : t("Karibu tena!")}
         </p>
         <form onSubmit={submit} className="mt-6 space-y-4">
           {mode === "up" && (
             <div className="space-y-1">
-              <Label htmlFor="name">Jina</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jina lako" />
+              <Label htmlFor="name">{t("Jina")}</Label>
+              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("Jina lako")} />
             </div>
           )}
           <div className="space-y-1">
-            <Label htmlFor="contact">Namba ya simu au Email</Label>
-            <Input id="contact" required value={contact} onChange={(e) => setContact(e.target.value)} placeholder="07XXXXXXXX au jina@mfano.com" />
+            <Label htmlFor="contact">{t("Namba ya simu au Email")}</Label>
+            <Input id="contact" required value={contact} onChange={(e) => setContact(e.target.value)} placeholder={t("07XXXXXXXX au jina@mfano.com")} />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="pw">Neno la siri</Label>
+            <Label htmlFor="pw">{t("Neno la siri")}</Label>
             <Input id="pw" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           <Button type="submit" className="w-full" disabled={busy}>
-            {busy ? "Subiri…" : mode === "up" ? "Jisajili na anza bure" : "Ingia"}
+            {busy ? t("Subiri…") : mode === "up" ? t("Jisajili na anza bure") : t("Ingia")}
           </Button>
         </form>
         <Button variant="ghost" className="mt-4 w-full text-sm text-muted-foreground" onClick={() => setMode(mode === "up" ? "in" : "up")}>
-          {mode === "up" ? "Una akaunti tayari? Ingia" : "Huna akaunti? Jisajili"}
+          {mode === "up" ? t("Una akaunti tayari? Ingia") : t("Huna akaunti? Jisajili")}
         </Button>
-        {!standalone && <Button asChild variant="link" className="mt-2 w-full"><Link to="/sakinisha">Sakinisha app kwenye simu</Link></Button>}
+        {!standalone && <Button asChild variant="link" className="mt-2 w-full"><Link to="/sakinisha">{t("Sakinisha app kwenye simu")}</Link></Button>}
       </div>
     </main>
   );

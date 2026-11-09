@@ -57,6 +57,13 @@
       "when": 1794096315027,
       "tag": "0007_match_day_and_comments",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794194579833,
+      "tag": "0008_app_wide_admin_settings",
+      "breakpoints": true
     }
   ]
 }

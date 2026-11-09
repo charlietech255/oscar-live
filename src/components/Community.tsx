@@ -1,3 +1,4 @@
+import { useAppSettings } from "@/components/AppSettingsProvider";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Heart, MessageCircle } from "lucide-react";
@@ -6,12 +7,14 @@ import { appearanceOptions } from "@/lib/site-appearance";
 import { DEFAULT_GROUP_URL } from "@/lib/customer-controls";
 import { Button } from "@/components/ui/button";
 export function CommunityButton({ floating = true }: { floating?: boolean }) {
+  const { t } = useAppSettings();
   const { data } = useQuery(appearanceOptions);
   const url = data?.group_url || DEFAULT_GROUP_URL;
   if (!/^https:\/\/chat\.whatsapp\.com\//.test(url)) return null;
-  return <Button asChild size="icon" className={`h-12 w-12 rounded-full ${floating?"fixed bottom-24 right-4 z-30":""}`}><a href={url} target="_blank" rel="noopener noreferrer" aria-label="Jiunge group la wateja" title="Group la wateja"><MessageCircle className="h-6 w-6"/></a></Button>;
+  return <Button asChild size="icon" className={`h-12 w-12 rounded-full ${floating?"fixed bottom-24 right-4 z-30":""}`}><a href={url} target="_blank" rel="noopener noreferrer" aria-label="Jiunge group la wateja" title={t("Group la wateja")}><MessageCircle className="h-6 w-6"/></a></Button>;
 }
 export function OutsideLikes() {
+  const { t } = useAppSettings();
   const [id,setId] = useState<string>();
   const [liked,setLiked] = useState(false);
   const [count,setCount] = useState(0);
@@ -26,5 +29,5 @@ export function OutsideLikes() {
     if (!id) return; setBusy(true);
     const {data,error}=await supabase.rpc("outside_likes",{_visitor:id,_like:!liked});
     if(!error){setCount(Number(data));setLiked(!liked);localStorage.setItem("outside-liked",String(!liked));} setBusy(false);
-  }}><Heart className={liked?"h-4 w-4 fill-current text-destructive":"h-4 w-4"}/> Like · {count.toLocaleString()}</Button>;
+  }}><Heart className={liked?"h-4 w-4 fill-current text-destructive":"h-4 w-4"}/>{" " + t("Like ·") + " "}{count.toLocaleString()}</Button>;
 }

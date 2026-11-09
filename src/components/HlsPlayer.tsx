@@ -1,8 +1,10 @@
+import { useAppSettings } from "@/components/AppSettingsProvider";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX, Maximize } from "lucide-react";
 
 export function HlsPlayer({ src }: { src: string }) {
+  const { t } = useAppSettings();
   const ref = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -82,7 +84,7 @@ export function HlsPlayer({ src }: { src: string }) {
         <Button
           size="sm"
           variant="secondary"
-          aria-label={muted ? "Washa sauti" : "Zima sauti"}
+          aria-label={muted ? t("Washa sauti") : t("Zima sauti")}
           onClick={() => {
             const v = ref.current;
             if (!v) return;
@@ -91,12 +93,12 @@ export function HlsPlayer({ src }: { src: string }) {
           }}
         >
           {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-          <span className="ml-1">{muted ? "Washa sauti" : "Sauti"}</span>
+          <span className="ml-1">{muted ? t("Washa sauti") : t("Sauti")}</span>
         </Button>
         <Button
           size="sm"
           variant="secondary"
-          aria-label="Skrini nzima"
+          aria-label={t("Skrini nzima")}
           onClick={() => {
             const v = ref.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
             const box = boxRef.current;
@@ -106,13 +108,13 @@ export function HlsPlayer({ src }: { src: string }) {
           }}
         >
           <Maximize className="h-4 w-4" />
-          <span className="ml-1">Skrini nzima</span>
+          <span className="ml-1">{t("Skrini nzima")}</span>
         </Button>
       </div>
       {error && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/90 p-4 text-center text-muted-foreground">
-          <p>Mtiririko huu haupatikani kwa sasa.</p>
-          <Button size="sm" onClick={() => setAttempt((a) => a + 1)}>Jaribu tena</Button>
+          <p>{t("Mtiririko huu haupatikani kwa sasa.")}</p>
+          <Button size="sm" onClick={() => setAttempt((a) => a + 1)}>{t("Jaribu tena")}</Button>
         </div>
       )}
     </div>

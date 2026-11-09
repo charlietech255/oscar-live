@@ -1,3 +1,4 @@
+import { ExtraContent, useAppSettings } from "@/components/AppSettingsProvider";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Download, ArrowRight, Smartphone, UserPlus } from "lucide-react";
 import { useState, type ReactNode } from "react";
@@ -26,11 +27,12 @@ export function InstallGate({ children }: { children: ReactNode }) {
 }
 
 function InstallIntroduction() {
+  const { t, settings, visible, image } = useAppSettings();
   const { available, installed, busy, install } = useInstall();
   const [message, setMessage] = useState("");
   const { data: appearance = defaultAppearance } = useQuery(appearanceOptions);
   const savedSlides=readSlides(appearance.slides);
-  const slides=savedSlides.length?savedSlides:appearance.image_url?[{image:appearance.image_url,title:appearance.title},...defaultSlides]:defaultSlides;
+  const slides=settings.slides ?? (savedSlides.length?savedSlides:appearance.image_url?[{image:appearance.image_url,title:appearance.title},...defaultSlides]:defaultSlides);
   async function startInstall() {
     const outcome = await install();
     setMessage(outcome === "accepted"
@@ -44,52 +46,53 @@ function InstallIntroduction() {
         <div className="absolute inset-0 -z-10 bg-background/50" />
         <div className="mx-auto w-full max-w-6xl px-6 pb-10 pt-24 sm:pb-16">
           <div className="mb-8 flex items-center gap-3">
-            <img src={appearance.logo_url || "/icon-192.png"} alt="" width={48} height={48} className="h-12 w-12 shrink-0 rounded-lg object-contain" />
-            <span className="min-w-0 break-words font-display text-lg">{appearance.title}</span>
+            <img src={image("appLogo", appearance.logo_url || "/icon-192.png")} alt="" width={48} height={48} className="h-12 w-12 shrink-0 rounded-lg object-contain" />
+            <span className="min-w-0 break-words font-display text-lg">{t(appearance.title)}</span>
           </div>
-          <p className="mb-3 break-words text-sm font-semibold uppercase text-accent">{appearance.tagline}</p>
-          <h1 className="max-w-xl break-words font-display text-3xl sm:text-5xl">{appearance.title}</h1>
-          <p className="mt-4 max-w-md break-words text-sm text-foreground">{appearance.description}</p>
+          <p className="mb-3 break-words text-sm font-semibold uppercase text-accent">{t(appearance.tagline)}</p>
+          <h1 className="max-w-xl break-words font-display text-3xl sm:text-5xl">{t(appearance.title)}</h1>
+          <p className="mt-4 max-w-md break-words text-sm text-foreground">{t(appearance.description)}</p>
           <div className="mt-7 flex flex-col items-start gap-3">
-            {installed ? <p role="status" className="font-semibold text-primary">App imesakinishwa. Ifungue kupitia ikoni kwenye simu yako.</p>
-              : available ? <Button className="h-auto min-h-11 max-w-full whitespace-normal py-3" size="lg" disabled={busy} onClick={startInstall}><Download className="mr-2 h-5 w-5 shrink-0" /> {busy ? "Inasakinisha…" : appearance.button_label}</Button>
-              : <Button className="h-auto min-h-11 max-w-full whitespace-normal py-3" size="lg" asChild><Link to="/sakinisha"><Download className="mr-2 h-5 w-5 shrink-0" /> {appearance.button_label}</Link></Button>}
-            <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">App ni nyepesi: MB 18 tu</span>
-            <Button asChild variant="link" className="h-auto px-0 text-foreground"><Link to="/sakinisha">Hatua za Android na iPhone <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
-            <Button asChild variant="outline"><Link to="/auth"><UserPlus className="mr-2 h-4 w-4" /> Jisajili / Ingia</Link></Button>
-            <OutsideLikes/>
+            {installed ? <p role="status" className="font-semibold text-primary">{t("App imesakinishwa. Ifungue kupitia ikoni kwenye simu yako.")}</p>
+              : available ? <Button className="h-auto min-h-11 max-w-full whitespace-normal py-3" size="lg" disabled={busy} onClick={startInstall}><Download className="mr-2 h-5 w-5 shrink-0" /> {busy ? "Inasakinisha…" : t(appearance.button_label)}</Button>
+              : <Button className="h-auto min-h-11 max-w-full whitespace-normal py-3" size="lg" asChild><Link to="/sakinisha"><Download className="mr-2 h-5 w-5 shrink-0" /> {t(appearance.button_label)}</Link></Button>}
+            <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">{t("App ni nyepesi: MB 18 tu")}</span>
+            <Button asChild variant="link" className="h-auto px-0 text-foreground"><Link to="/sakinisha">{t("Hatua za Android na iPhone") + " "}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+            <Button asChild variant="outline"><Link to="/auth"><UserPlus className="mr-2 h-4 w-4" />{" " + t("Jisajili / Ingia")}</Link></Button>
+            {visible("outsideLikes") && <OutsideLikes/>}
             {message && <p role="status" className="max-w-md text-sm text-primary">{message}</p>}
           </div>
         </div>
       </section>
-      <section className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-8">
+      {visible("phoneIntroduction") && <section className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-8">
         <Smartphone className="h-8 w-8 shrink-0 text-primary" />
-        <div><h2 className="font-display text-lg">APP KWENYE SIMU YAKO</h2><p className="text-sm text-muted-foreground">Android au iPhone. Hakuna APK inayohitajika; kutazama kunahitaji intaneti.</p></div>
-      </section>
-      <section className="border-y border-border bg-card">
+        <div><h2 className="font-display text-lg">{t("APP KWENYE SIMU YAKO")}</h2><p className="text-sm text-muted-foreground">{t("Android au iPhone. Hakuna APK inayohitajika; kutazama kunahitaji intaneti.")}</p></div>
+      </section>}
+      {visible("dataOffers") && <section className="border-y border-border bg-card">
         <div className="mx-auto max-w-6xl px-6 py-10">
           <div className="relative isolate overflow-hidden rounded-lg bg-background px-6 py-8 sm:px-8">
-            <img src={mobileData} alt="Simu na laini za intaneti" width={1200} height={800} loading="lazy" className="absolute inset-0 -z-20 h-full w-full object-cover object-right" />
+            <img src={image("mobileData", mobileData)} alt={t("Simu na laini za intaneti")} width={1200} height={800} loading="lazy" className="absolute inset-0 -z-20 h-full w-full object-cover object-right" />
             <div className="absolute inset-0 -z-10 bg-background/60" />
-            <p className="text-sm font-semibold uppercase text-accent">Vifurushi vya intaneti</p>
-            <h2 className="mt-2 font-display text-2xl sm:text-3xl">TUNAUZA PIA GB</h2>
-            <p className="mt-2 text-sm text-foreground">Chagua kiasi cha MB au GB unachohitaji.</p>
+            <p className="text-sm font-semibold uppercase text-accent">{t("Vifurushi vya intaneti")}</p>
+            <h2 className="mt-2 font-display text-2xl sm:text-3xl">{t("TUNAUZA PIA GB")}</h2>
+            <p className="mt-2 text-sm text-foreground">{t("Chagua kiasi cha MB au GB unachohitaji.")}</p>
           </div>
           <dl className="mt-6 grid grid-cols-2 gap-x-6 sm:grid-cols-3 lg:grid-cols-4">
-            {dataBundles.map(bundle => <div key={bundle.label} className="border-b border-border py-5">
+            {(settings.dataOffers ?? dataBundles).map(bundle => <div key={bundle.label} className="border-b border-border py-5">
               <dt className="font-display text-xl">{bundle.label}</dt>
-              <dd className="mt-1 font-semibold text-primary">TSh {bundle.price.toLocaleString("en-US")}</dd>
+              <dd className="mt-1 font-semibold text-primary">{t("TSh") + " "}{bundle.price.toLocaleString("en-US")}</dd>
             </div>)}
           </dl>
         </div>
-      </section>
-      <section className="mx-auto max-w-6xl px-6 py-10">
-        <h2 className="font-display text-xl">NDANI YA KASIGARA TV</h2>
+      </section>}
+      {visible("insidePreview") && <section className="mx-auto max-w-6xl px-6 py-10">
+        <h2 className="font-display text-xl">{t("NDANI YA KASIGARA TV")}</h2>
         <figure className="mt-4 max-w-md">
-          <img src={insidePreview} alt="Muonekano wa ndani wa Kasigara TV: utafutaji, makundi na picha za chaneli" width={395} height={310} loading="lazy" className="h-auto w-full rounded-lg border border-border" />
+          <img src={image("insidePreview", insidePreview)} alt={t("Muonekano wa ndani wa Kasigara TV: utafutaji, makundi na picha za chaneli")} width={395} height={310} loading="lazy" className="h-auto w-full rounded-lg border border-border" />
         </figure>
-      </section>
-      <CommunityButton/>
+      </section>}
+      <ExtraContent page="/outside"/>
+      {visible("community") && <CommunityButton/>}
     </main>
   );
 }

@@ -16,6 +16,7 @@ import { CATEGORIES, formatTsh, hasAccess, validatePackage } from "@/lib/package
 import { prepareChannelLogo } from "@/lib/channel-logo";
 import { AppearanceEditor } from "@/components/AppearanceEditor";
 import { MatchEditor } from "@/components/MatchCenter";
+import { AppSettingsEditor } from "@/components/AppSettingsEditor";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -36,6 +37,7 @@ const emptyPkg = { id: "", label: "", price: 1000, days: 1, description: "", ima
 
 function Admin() {
   const { isAdmin, user } = useAuth();
+  const [tab, setTab] = useState("settings");
   const qc = useQueryClient();
   const [form, setForm] = useState(empty);
   const logoInput = useRef<HTMLInputElement>(null);
@@ -107,7 +109,7 @@ function Admin() {
     const list = [...(channels.data ?? [])];
     const j = index + dir;
     if (j < 0 || j >= list.length) return;
-    const t = list[index]!; list[index] = list[j]!; list[j] = t;
+    const t = list[index], other = list[j]; if (!t || !other) return; list[index] = other; list[j] = t;
     await Promise.all(list.map((c, i) => supabase.from("channels").update({ sort_order: i + 1 }).eq("id", c.id)));
     qc.invalidateQueries({ queryKey: ["channels"] });
   }
@@ -177,8 +179,9 @@ function Admin() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="font-display text-3xl tracking-wide">Usimamizi</h1>
-      <Tabs defaultValue="payments" className="mt-6">
+      <Tabs value={tab} onValueChange={setTab} className="mt-6">
         <TabsList className="h-auto flex-wrap justify-start">
+          <TabsTrigger value="settings">Mipangilio ya app</TabsTrigger>
           <TabsTrigger value="payments">Malipo {pending > 0 && `(${pending})`}</TabsTrigger>
           <TabsTrigger value="channels">Chaneli</TabsTrigger>
           <TabsTrigger value="packages">Vifurushi</TabsTrigger>
@@ -186,6 +189,7 @@ function Admin() {
           <TabsTrigger value="appearance">Muonekano wa nje</TabsTrigger>
           <TabsTrigger value="match">Mechi ya leo</TabsTrigger>
         </TabsList>
+        <TabsContent value="settings" className="mt-4"><AppSettingsEditor manage={setTab}/></TabsContent>
         <TabsContent value="match" className="mt-4"><MatchEditor /></TabsContent>
 
         <TabsContent value="payments" className="mt-4 space-y-2">

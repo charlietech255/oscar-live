@@ -1,4 +1,6 @@
 # Roadmap
+- [ ] App-wide admin settings: editable words, pictures, section visibility and links to existing management
+- [ ] Verify settings persist and appear for customers; protect writes to admins
 - [ ] Bottom Home / Live / Akaunti navigation and left-side secondary menu
 - [ ] Rotating outside and inside pictures with admin uploads; full-card channel images
 - [ ] Circular WhatsApp group and outside likes with persistent count

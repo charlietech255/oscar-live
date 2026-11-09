@@ -20,6 +20,7 @@ import { InstallGate } from "@/components/InstallGate";
 import { useAuth } from "@/hooks/useAuth";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { CommunityButton } from "@/components/Community";
+import { AppSettingsProvider, ExtraContent, useAppSettings } from "@/components/AppSettingsProvider";
 
 function NotFoundComponent() {
   return (
@@ -126,13 +127,17 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <InstallProvider>
+      <AppSettingsProvider>
       <AppContent />
+      </AppSettingsProvider>
       </InstallProvider>
     </QueryClientProvider>
   );
 }
 
 function AppContent() {
+  const { visible } = useAppSettings();
+  const pathname = useRouter().state.location.pathname;
   const { ready } = useInstall();
   const { user } = useAuth();
   return (
@@ -140,8 +145,8 @@ function AppContent() {
       <InstallGate>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       {ready && user && <SiteHeader />}
-       <div className="pb-24"><Outlet /></div>
-       {ready && user && <><BottomNavigation/><CommunityButton/></>}
+       <div className="pb-24"><Outlet /><ExtraContent page={pathname}/></div>
+       {ready && user && <>{visible("bottomNavigation") && <BottomNavigation/>}{visible("community") && <CommunityButton/>}</>}
       </InstallGate>
       <Toaster />
     </>
