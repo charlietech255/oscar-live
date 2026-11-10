@@ -7,3 +7,8 @@ export function validateCorrection(amount: number, price: number, note: string) 
   if (!Number.isInteger(amount) || amount !== price) return "Kiasi lazima kilingane na bei ya kifurushi.";
   return note.trim().length >= 3 ? null : "Andika sababu ya marekebisho.";
 }
+
+export function validateBonusMinutes(minutes: number) {
+  if (!Number.isInteger(minutes) || minutes < 1 || minutes > 43200) return "Weka dakika kamili kati ya 1 na 43,200.";
+  return null;
+}

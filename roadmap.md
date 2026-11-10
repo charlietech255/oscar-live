@@ -1,4 +1,8 @@
 # Roadmap
+- [x] Style B channel cards: two square cards per row, full logo and green frame
+- [x] Apply the admin colour choice across the whole app
+- [x] Admin customer offers starting at five minutes, plus suspend/reactivate controls
+- [ ] Verify bonus minutes, suspension and colour saving as admin — blocked until the owner signs in to the preview
 - [ ] App-wide admin settings: editable words, pictures, section visibility and links to existing management
 - [ ] Verify settings persist and appear for customers; protect writes to admins
 - [ ] Bottom Home / Live / Akaunti navigation and left-side secondary menu

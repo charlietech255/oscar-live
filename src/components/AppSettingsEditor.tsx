@@ -79,7 +79,7 @@ function SettingsForm({ initial, manage }: { initial: AppSettings; manage: (tab:
       <TabsContent value="payments"><PaymentSettings/></TabsContent>
       <TabsContent value="outside"><AppearanceEditor/><div className="mt-6"><Label htmlFor="settings-group">Group la WhatsApp</Label><Input id="settings-group" defaultValue={appearance.group_url} onBlur={async e => { const url = e.target.value.trim(); if (url && !/^https:\/\/chat\.whatsapp\.com\//.test(url)) { toast.error("Weka linki sahihi ya group."); return; } const { error } = await supabase.from("site_appearance").upsert({ ...appearance, group_url: url }); if (error) toast.error("Group halijahifadhiwa."); else { await qc.invalidateQueries(appearanceOptions); toast.success("Group limehifadhiwa."); } }}/></div></TabsContent>
       <TabsContent value="chat"><LiveComments/></TabsContent>
-      <TabsContent value="manage" className="flex flex-wrap gap-3">{[["channels", "Chaneli: majina, picha na video"], ["packages", "Vifurushi: bei, picha na muda"], ["match", "Mechi, matokeo na takwimu"], ["users", "Watumiaji"], ["payments", "Uthibitisho wa malipo"]].map(([tab, label]) => <Button key={tab} variant="outline" onClick={() => manage(tab)}>{label}</Button>)}</TabsContent>
+      <TabsContent value="manage" className="flex flex-wrap gap-3">{([["channels", "Chaneli: majina, picha na video"], ["packages", "Vifurushi: bei, picha na muda"], ["match", "Mechi, matokeo na takwimu"], ["users", "Watumiaji"], ["payments", "Uthibitisho wa malipo"]] as const).map(([tab, label]) => <Button key={tab} variant="outline" onClick={() => manage(tab)}>{label}</Button>)}</TabsContent>
     </Tabs>
   </div>;
 }

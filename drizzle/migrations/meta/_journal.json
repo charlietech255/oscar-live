@@ -64,6 +64,13 @@
       "when": 1794194579833,
       "tag": "0008_app_wide_admin_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794284846014,
+      "tag": "0009_grant_customer_bonus_minutes",
+      "breakpoints": true
     }
   ]
 }

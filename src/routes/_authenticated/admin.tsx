@@ -12,11 +12,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { parseM3U, guessCategory } from "@/lib/m3u";
-import { CATEGORIES, formatTsh, hasAccess, validatePackage } from "@/lib/packages";
+import { CATEGORIES, formatTsh, validatePackage } from "@/lib/packages";
 import { prepareChannelLogo } from "@/lib/channel-logo";
 import { AppearanceEditor } from "@/components/AppearanceEditor";
 import { MatchEditor } from "@/components/MatchCenter";
 import { AppSettingsEditor } from "@/components/AppSettingsEditor";
+import { CustomerManagement } from "@/components/CustomerManagement";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -324,24 +325,7 @@ function Admin() {
           </form>
         </TabsContent>
 
-        <TabsContent value="users" className="mt-4">
-          <div className="overflow-x-auto rounded-xl border border-border bg-card">
-            <table className="w-full text-sm">
-              <thead className="text-left text-muted-foreground"><tr><th className="p-3">Jina</th><th className="p-3">Simu/Email</th><th className="p-3">Majaribio hadi</th><th className="p-3">Kifurushi hadi</th><th className="p-3">Hali</th></tr></thead>
-              <tbody>
-                {users.data?.map((u) => (
-                  <tr key={u.id} className="border-t border-border">
-                    <td className="p-3">{u.display_name}</td>
-                    <td className="p-3">{u.contact}</td>
-                    <td className="p-3">{new Date(u.trial_ends_at).toLocaleString("sw-TZ")}</td>
-                    <td className="p-3">{u.subscription_ends_at ? new Date(u.subscription_ends_at).toLocaleString("sw-TZ") : "—"}</td>
-                    <td className="p-3">{hasAccess(u) ? <span className="text-primary">Hai</span> : <span className="text-muted-foreground">Imeisha</span>}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </TabsContent>
+        <TabsContent value="users" className="mt-4"><CustomerManagement /></TabsContent>
         <TabsContent value="appearance" className="mt-6"><AppearanceEditor /></TabsContent>
       </Tabs>
     </main>

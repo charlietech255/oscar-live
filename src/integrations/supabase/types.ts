@@ -419,6 +419,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      grant_customer_minutes: {
+        Args: { _minutes: number; _user_id: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

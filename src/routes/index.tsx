@@ -212,11 +212,11 @@ export function ChannelScreen({liveOnly=false}:{liveOnly?:boolean}) {
                   onClick={() => openChannel(c.id)}
                   className={cn(
                     "group flex h-auto w-full flex-col items-stretch gap-0 overflow-hidden whitespace-normal rounded-lg border p-0 text-left transition-colors",
-                    current?.id === c.id ? "border-primary bg-primary/10 ring-1 ring-primary" : "border-border bg-card hover:bg-secondary",
+                    current?.id === c.id ? "border-primary bg-primary/10 ring-2 ring-primary" : "border-primary/50 bg-card hover:border-primary hover:bg-secondary",
                   )}
                 >
-                  <div className="relative aspect-video w-full overflow-hidden bg-secondary">
-                    <img src={c.logo_url || image("channelFallback", channelCover)} alt="" className="h-full w-full object-contain" loading="lazy" width={384} height={216} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = channelCover; }} />
+                  <div className="relative aspect-square w-full overflow-hidden bg-secondary p-4">
+                    <img src={c.logo_url || image("channelFallback", channelCover)} alt="" className="h-full w-full object-contain" loading="lazy" width={384} height={384} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = channelCover; }} />
                     {visible("cardBadges") && <span className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-background/85 text-primary">
                       {c.is_premium && !hasAccess(profile) ? <Lock className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
                     </span>}

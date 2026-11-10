@@ -21,6 +21,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { CommunityButton } from "@/components/Community";
 import { AppSettingsProvider, ExtraContent, useAppSettings } from "@/components/AppSettingsProvider";
+import { AppearanceTheme } from "@/components/AppearanceTheme";
 
 function NotFoundComponent() {
   return (
@@ -127,6 +128,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <InstallProvider>
+      <AppearanceTheme />
       <AppSettingsProvider>
       <AppContent />
       </AppSettingsProvider>
