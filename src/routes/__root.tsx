@@ -19,7 +19,6 @@ import { useInstall } from "@/components/InstallProvider";
 import { InstallGate } from "@/components/InstallGate";
 import { useAuth } from "@/hooks/useAuth";
 import { BottomNavigation } from "@/components/BottomNavigation";
-import { CommunityButton } from "@/components/Community";
 import { AppSettingsProvider, ExtraContent, useAppSettings } from "@/components/AppSettingsProvider";
 import { AppearanceTheme } from "@/components/AppearanceTheme";
 
@@ -148,7 +147,7 @@ function AppContent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       {ready && user && <SiteHeader />}
        <div className="pb-24"><Outlet /><ExtraContent page={pathname}/></div>
-       {ready && user && <>{visible("bottomNavigation") && <BottomNavigation/>}{visible("community") && <CommunityButton/>}</>}
+       {ready && user && visible("bottomNavigation") && <BottomNavigation/>}
       </InstallGate>
       <Toaster />
     </>

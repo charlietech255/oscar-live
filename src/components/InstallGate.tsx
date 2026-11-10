@@ -14,7 +14,7 @@ import { appearanceOptions, defaultAppearance } from "@/lib/site-appearance";
 import { useAuth } from "@/hooks/useAuth";
 import { RotatingPictures } from "@/components/Showcase";
 import { defaultSlides, readSlides } from "@/lib/showcase";
-import { CommunityButton, OutsideLikes } from "@/components/Community";
+import { OutsideLikes } from "@/components/Community";
 
 export function InstallGate({ children }: { children: ReactNode }) {
   const { ready, standalone } = useInstall();
@@ -92,7 +92,6 @@ function InstallIntroduction() {
         </figure>
       </section>}
       <ExtraContent page="/outside"/>
-      {visible("community") && <CommunityButton/>}
     </main>
   );
 }
