@@ -187,6 +187,7 @@ function Admin() {
           <TabsTrigger value="channels">Chaneli</TabsTrigger>
           <TabsTrigger value="packages">Vifurushi</TabsTrigger>
           <TabsTrigger value="users">Watumiaji</TabsTrigger>
+          <TabsTrigger value="administrators">Wasimamizi</TabsTrigger>
           <TabsTrigger value="appearance">Muonekano wa nje</TabsTrigger>
           <TabsTrigger value="match">Mechi ya leo</TabsTrigger>
         </TabsList>
@@ -326,6 +327,7 @@ function Admin() {
         </TabsContent>
 
         <TabsContent value="users" className="mt-4"><CustomerManagement /></TabsContent>
+        <TabsContent value="administrators" className="mt-4"><CustomerManagement administrators /></TabsContent>
         <TabsContent value="appearance" className="mt-6"><AppearanceEditor /></TabsContent>
       </Tabs>
     </main>

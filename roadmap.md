@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Add an administrator section for promoting and removing administrators
 - [x] Style B channel cards: two square cards per row, full logo and green frame
 - [x] Apply the admin colour choice across the whole app
 - [x] Admin customer offers starting at five minutes, plus suspend/reactivate controls
