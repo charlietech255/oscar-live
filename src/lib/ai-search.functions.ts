@@ -5,7 +5,7 @@ import type { Database } from "@/integrations/supabase/types";
 export type AiSearchResult = { ids: string[]; message: string; error?: string };
 
 export const aiFindChannels = createServerFn({ method: "POST" })
-  .inputValidator((input: { query: string }) => {
+  .validator((input: { query: string }) => {
     const query = String(input?.query ?? "").trim().slice(0, 300);
     if (query.length < 2) throw new Error("Andika unachotafuta");
     return { query };

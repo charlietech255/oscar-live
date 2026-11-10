@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const deleteCustomer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ userId: z.string().uuid() }))
+  .validator(z.object({ userId: z.string().uuid() }))
   .handler(async ({ data, context }) => {
     const { data: owner, error } = await context.supabase.rpc("is_app_owner");
     if (error || !owner || data.userId === context.userId) throw new Error("Mmiliki pekee anaweza kufuta mteja mwingine.");
