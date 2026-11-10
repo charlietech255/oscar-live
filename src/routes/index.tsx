@@ -2,12 +2,9 @@ import { useAppSettings } from "@/components/AppSettingsProvider";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Radio, Lock, Sparkles, Play } from "lucide-react";
-import { useServerFn } from "@tanstack/react-start";
-import { aiFindChannels, type AiSearchResult } from "@/lib/ai-search.functions";
+import { Radio, Lock, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { HlsPlayer } from "@/components/HlsPlayer";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { CATEGORIES, hasAccess } from "@/lib/packages";
@@ -36,14 +33,8 @@ export function ChannelScreen({liveOnly=false}:{liveOnly?:boolean}) {
   const { t, visible, image } = useAppSettings();
   const { user, ready, profile } = useAuth();
   const [cat, setCat] = useState<string>("Zote");
-  const [q, setQ] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [aiQ, setAiQ] = useState("");
-  const [aiBusy, setAiBusy] = useState(false);
-  const [ai, setAi] = useState<AiSearchResult | null>(null);
-  const findFn = useServerFn(aiFindChannels);
   const playerRef = useRef<HTMLElement>(null);
-  const [foundName, setFoundName] = useState<string | null>(null);
   const [now,setNow] = useState(()=>Date.now());
   useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),1000);return ()=>clearInterval(timer);},[]);
 
@@ -57,42 +48,19 @@ export function ChannelScreen({liveOnly=false}:{liveOnly?:boolean}) {
   });
 
   const filtered = useMemo(
-    () => channels.filter((c) => (!liveOnly||c.is_live) && (cat === "Zote" || c.category === cat) && c.name.toLowerCase().includes(q.toLowerCase())),
-    [channels, cat, q, liveOnly],
+    () => channels.filter((c) => (!liveOnly||c.is_live) && (cat === "Zote" || c.category === cat)),
+    [channels, cat, liveOnly],
   );
   const current = channels.find((c) => c.id === selectedId) ?? (liveOnly?channels.find(c=>c.is_live):channels[0]);
   const access = !!current && !profile?.is_suspended && (!current.is_premium || hasAccess(profile,new Date(now)));
-  const shownChannels = ai?.ids.length
-    ? ai.ids.flatMap((id) => { const channel = channels.find((c) => c.id === id); return channel ? [channel] : []; })
-    : filtered;
+  const shownChannels = filtered;
 
   function openChannel(id: string) {
     setSelectedId(id);
-    setFoundName(null);
     playerRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
     if (current?.id === id) {
       const video = playerRef.current?.querySelector("video");
       if (video) video.play().catch(() => { video.muted = true; void video.play().catch(() => {}); });
-    }
-  }
-
-  async function runAi(query: string) {
-    if (query.trim().length < 2 || aiBusy) return;
-    setAiBusy(true);
-    setFoundName(null);
-    try {
-      const r = await findFn({ data: { query } });
-      setAi(r);
-      const first = channels.find((c) => c.id === r.ids[0]);
-      if (first) {
-        setSelectedId(first.id);
-        setFoundName(first.name);
-        playerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    } catch {
-      setAi({ ids: [], message: "", error: "Imeshindikana kutafuta kwa sasa." });
-    } finally {
-      setAiBusy(false);
     }
   }
 
@@ -102,35 +70,8 @@ export function ChannelScreen({liveOnly=false}:{liveOnly?:boolean}) {
     <main className="mx-auto max-w-6xl px-4 py-6">
       {visible("insideShowcase") && <Showcase/>}
       {visible("trialNotice") && user && trialLeft>0 && !hasAccess(profile?.subscription_ends_at?{trial_ends_at:"1970-01-01",subscription_ends_at:profile.subscription_ends_at}:null,new Date(now)) && <p role="timer" className="mb-4 text-xs font-semibold text-primary">{t("Ofa ya bure ·") + " "}{Math.floor(trialLeft/60)}:{String(trialLeft%60).padStart(2,"0")}</p>}
-      {visible("aiSearch") && <form
-        onSubmit={(e) => { e.preventDefault(); runAi(aiQ); }}
-        className="mb-5 rounded-xl border border-accent/40 bg-accent/5 p-3"
-      >
-        <label className="flex items-center gap-1 text-sm font-semibold text-accent"><Sparkles className="h-4 w-4" />{" " + t("Tafuta mechi kwa AI")}</label>
-        <div className="mt-2 flex gap-2">
-          <Input value={aiQ} onChange={(e) => setAiQ(e.target.value)} placeholder={t("Mf. Simba vs Yanga, Ligi Kuu, Arsenal…")} maxLength={300} />
-          <Button type="submit" disabled={aiBusy}>{aiBusy ? "Inatafuta…" : t("Tafuta")}</Button>
-        </div>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {["Ligi Kuu", "Mechi za leo", "Chaneli za bure", "Filamu"].map((term) => (
-            <button key={term} type="button" disabled={aiBusy} onClick={() => { setAiQ(term); runAi(term); }}
-              className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground hover:bg-muted">{t(term)}</button>
-          ))}
-        </div>
-        {ai && (
-          <p className={cn("mt-2 text-sm", ai.error ? "text-destructive" : "text-muted-foreground")}>
-            {ai.error ?? (ai.message || (ai.ids.length ? "" : t("Hakuna chaneli inayolingana.")))}
-            {ai.ids.length > 0 && (
-              <button type="button" className="ml-2 underline" onClick={() => setAi(null)}>{t("Onyesha zote")}</button>
-            )}
-          </p>
-        )}
-      </form>}
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <section ref={playerRef} className="scroll-mt-20">
-          {foundName && (
-            <p className="mb-2 rounded-lg bg-primary/15 px-3 py-2 text-sm font-semibold text-primary">{t("Tumekupatia:") + " "}{foundName}{" " + t("— inacheza sasa!")}</p>
-          )}
           {current && access ? (
             <div className="relative">
               <HlsPlayer key={current.id} src={current.stream_url} />
@@ -184,15 +125,11 @@ export function ChannelScreen({liveOnly=false}:{liveOnly?:boolean}) {
         </section>
 
         <aside className="min-w-0">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input value={q} onChange={(e) => { setQ(e.target.value); setAi(null); }} placeholder={t("Tafuta chaneli…")} className="pl-9" />
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {["Zote", ...CATEGORIES].map((c) => (
               <button
                 key={c}
-                onClick={() => { setCat(c); setAi(null); }}
+                onClick={() => setCat(c)}
                 className={cn(
                   "rounded-full px-3 py-1 text-sm font-medium transition-colors",
                   cat === c ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-muted",
