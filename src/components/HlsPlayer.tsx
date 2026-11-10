@@ -5,6 +5,7 @@ export interface HlsPlayerProps {
   streamType?: "dash" | "hls" | "direct" | string;
   kid?: string;
   key?: string;
+  licenseUrl?: string;
   poster?: string;
 }
 
@@ -15,13 +16,14 @@ export interface HlsPlayerProps {
  * Plays HLS via Hls.js with 20s buffering goal.
  * Backwards compatible with existing HlsPlayer usages.
  */
-export function HlsPlayer({ src, streamType, kid, key, poster }: HlsPlayerProps) {
+export function HlsPlayer({ src, streamType, kid, key, licenseUrl, poster }: HlsPlayerProps) {
   return (
     <MyTvStreamPlayer
       src={src}
       streamType={streamType}
       kid={kid}
       clearKey={key}
+      licenseUrl={licenseUrl}
       poster={poster}
       autoPlay={true}
     />

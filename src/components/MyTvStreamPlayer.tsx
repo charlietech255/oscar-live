@@ -10,10 +10,12 @@ export interface MyTvStreamPlayerProps {
   kid?: string;
   key?: string;
   clearKey?: string;
+  licenseUrl?: string;
   streamDetails?: MyTvStreamResponse | null;
   channelName?: string;
   poster?: string;
   autoPlay?: boolean;
+  showDebugBadge?: boolean;
   onStreamReady?: () => void;
   onError?: (error: Error | string) => void;
 }
@@ -24,10 +26,12 @@ export function MyTvStreamPlayer({
   kid: propKid,
   key: propKey,
   clearKey,
+  licenseUrl,
   streamDetails,
   channelName,
   poster,
   autoPlay = true,
+  showDebugBadge = false,
   onStreamReady,
   onError,
 }: MyTvStreamPlayerProps) {
@@ -119,6 +123,14 @@ export function MyTvStreamPlayer({
             drmConfig.clearKeys = {
               [cleanKid]: cleanKey,
               ...(effectiveKid !== cleanKid ? { [effectiveKid]: effectiveKey } : {}),
+            };
+          }
+
+          const effectiveLicenseUrl = licenseUrl || streamDetails?.drm_license_url;
+          if (effectiveLicenseUrl) {
+            drmConfig.servers = {
+              ...(drmConfig.servers || {}),
+              "org.w3.clearkey": effectiveLicenseUrl,
             };
           }
 
@@ -315,30 +327,32 @@ export function MyTvStreamPlayer({
         onPause={() => setIsPlaying(false)}
       />
 
-      {/* Engine & Buffering HUD Overlay */}
-      <div className="pointer-events-none absolute left-3 top-3 z-20 flex flex-wrap items-center gap-1.5 opacity-90 transition-opacity group-hover:opacity-100">
-        {activeEngine === "shaka" && (
-          <span className="inline-flex items-center gap-1 rounded bg-indigo-600/90 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur">
-            <Cpu className="h-3 w-3" /> Shaka Player (DASH)
-          </span>
-        )}
+      {/* Engine & Buffering HUD Overlay (Only when showDebugBadge is enabled) */}
+      {showDebugBadge && (
+        <div className="pointer-events-none absolute left-3 top-3 z-20 flex flex-wrap items-center gap-1.5 opacity-90 transition-opacity group-hover:opacity-100">
+          {activeEngine === "shaka" && (
+            <span className="inline-flex items-center gap-1 rounded bg-indigo-600/90 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur">
+              <Cpu className="h-3 w-3" /> Shaka Player (DASH)
+            </span>
+          )}
 
-        {activeEngine === "hlsjs" && (
-          <span className="inline-flex items-center gap-1 rounded bg-orange-600/90 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur">
-            <Cpu className="h-3 w-3" /> Hls.js (HLS)
-          </span>
-        )}
+          {activeEngine === "hlsjs" && (
+            <span className="inline-flex items-center gap-1 rounded bg-orange-600/90 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur">
+              <Cpu className="h-3 w-3" /> Hls.js (HLS)
+            </span>
+          )}
 
-        {activeKid && (
-          <span className="inline-flex items-center gap-1 rounded bg-emerald-600/90 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur">
-            <ShieldCheck className="h-3 w-3" /> ClearKey DRM ({activeKid})
-          </span>
-        )}
+          {activeKid && (
+            <span className="inline-flex items-center gap-1 rounded bg-emerald-600/90 px-2 py-0.5 text-[11px] font-semibold text-white backdrop-blur">
+              <ShieldCheck className="h-3 w-3" /> ClearKey DRM ({activeKid})
+            </span>
+          )}
 
-        <span className="inline-flex items-center rounded bg-zinc-800/85 px-1.5 py-0.5 text-[10px] font-medium text-zinc-300 backdrop-blur">
-          20s Buffer Goal
-        </span>
-      </div>
+          <span className="inline-flex items-center rounded bg-zinc-800/85 px-1.5 py-0.5 text-[10px] font-medium text-zinc-300 backdrop-blur">
+            20s Buffer Goal
+          </span>
+        </div>
+      )}
 
       {/* Control Buttons */}
       <div className="absolute right-3 top-3 z-20 flex items-center gap-2">
