@@ -22,6 +22,10 @@ import {
   type MyTvChannel,
   type MyTvStreamResponse,
 } from "@/lib/mytv-api";
+import {
+  fetchMyTvCatalogServerFn,
+  fetchMyTvStreamServerFn,
+} from "@/lib/mytv.functions";
 import { MyTvStreamPlayer } from "@/components/MyTvStreamPlayer";
 import channelCover from "@/assets/channel-cover.jpg";
 
@@ -52,6 +56,23 @@ export function MyTvLiveStreaming() {
     setLoadingChannels(true);
     setApiError(null);
 
+    // Try server function first to bypass browser Origin restrictions in preview environments
+    try {
+      const serverResult = await fetchMyTvCatalogServerFn({ data: { apiKey: key, apiBase: base } });
+      if (serverResult?.channels && serverResult.channels.length > 0 && !serverResult.isDemoFallback) {
+        setChannels(serverResult.channels);
+        setIsDemoFallback(false);
+        setApiError(null);
+        const first = serverResult.channels[0];
+        setSelectedChannel(first);
+        loadStream(first.id, key, base);
+        setLoadingChannels(false);
+        return;
+      }
+    } catch {
+      // Continue to direct browser fetch
+    }
+
     const result = await fetchLiveCatalog(key, base);
     setChannels(result.channels);
     setIsDemoFallback(result.isDemoFallback);
@@ -77,6 +98,16 @@ export function MyTvLiveStreaming() {
   // -------------------------------------------------------------
   const loadStream = async (channelId: string | number, key: string, base: string) => {
     setLoadingStream(true);
+    try {
+      const serverData = await fetchMyTvStreamServerFn({ data: { id: channelId, apiKey: key, apiBase: base } });
+      if (serverData && (serverData.playback_url || serverData.stream_url || serverData.url)) {
+        setStreamDetails(serverData);
+        setLoadingStream(false);
+        return;
+      }
+    } catch {
+      // Continue to direct browser fetch
+    }
     const data = await fetchStreamDetails(channelId, key, base);
     setStreamDetails(data);
     setLoadingStream(false);
