@@ -20,7 +20,11 @@ import {
   fetchMyTvCatalogServerFn,
   fetchMyTvStreamServerFn,
 } from "@/lib/mytv.functions";
-import { MYTV_DEFAULT_API_KEY, MYTV_DEFAULT_API_BASE } from "@/lib/mytv-api";
+import {
+  MYTV_DEFAULT_API_KEY,
+  MYTV_DEFAULT_API_BASE,
+  getHardcodedClearKey,
+} from "@/lib/mytv-api";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -189,16 +193,31 @@ export function ChannelScreen({ liveOnly = false }: { liveOnly?: boolean }) {
           const stream = res?.stream || res;
           const playbackUrl = stream?.playback_url || stream?.url || stream?.stream_url;
           const clearKey = stream?.clearkey || stream?.clearKey;
+          const hardcoded =
+            getHardcodedClearKey(current.id) ||
+            getHardcodedClearKey(current.name);
+
           setStreamInfo({
             url: playbackUrl,
             type: stream?.type || current.stream_type || "dash",
-            kid: clearKey?.kid,
-            key: clearKey?.key,
+            kid: hardcoded?.kid || clearKey?.kid,
+            key: hardcoded?.key || clearKey?.key,
             licenseUrl: stream?.drm_license_url,
           });
         })
         .catch((err) => {
           console.error("Stream resolution failed:", err);
+          const hardcoded =
+            getHardcodedClearKey(current.id) ||
+            getHardcodedClearKey(current.name);
+          if (current.stream_url) {
+            setStreamInfo({
+              url: current.stream_url,
+              type: current.stream_type || "dash",
+              kid: hardcoded?.kid,
+              key: hardcoded?.key,
+            });
+          }
         })
         .finally(() => {
           setLoadingStream(false);
@@ -209,7 +228,7 @@ export function ChannelScreen({ liveOnly = false }: { liveOnly?: boolean }) {
         type: "hls",
       });
     }
-  }, [current?.id, current?.is_mytv]);
+  }, [current?.id, current?.is_mytv, current?.name]);
 
   const shownChannels = ai?.ids.length
     ? ai.ids.flatMap((id) => {
@@ -328,12 +347,19 @@ export function ChannelScreen({ liveOnly = false }: { liveOnly?: boolean }) {
                   key={`${current.id}-${streamInfo.url}`}
                   src={streamInfo.url}
                   streamType={streamInfo.type}
+                  channelId={String(current.id)}
+                  channelName={current.name}
                   kid={streamInfo.kid}
-                  key={streamInfo.key}
+                  clearKey={streamInfo.key}
                   licenseUrl={streamInfo.licenseUrl}
                 />
               ) : (
-                <HlsPlayer key={current.id} src={current.stream_url || ""} />
+                <HlsPlayer
+                  key={current.id}
+                  src={current.stream_url || ""}
+                  channelId={String(current.id)}
+                  channelName={current.name}
+                />
               )}
               {visible("scoreboard") && <Scoreboard />}
               {visible("liveBadges") && (

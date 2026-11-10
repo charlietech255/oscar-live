@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   normalizeHex,
   extractClearKey,
+  getHardcodedClearKey,
   detectStreamType,
   fetchLiveCatalog,
   fetchStreamDetails,
@@ -56,6 +57,32 @@ describe("myTV Streaming API & Player Utilities", () => {
 
     it("should return null when keys are missing", () => {
       expect(extractClearKey({})).toBeNull();
+    });
+  });
+
+  describe("getHardcodedClearKey", () => {
+    it("should return valid keys for Azam Sport 1 by id and name", () => {
+      const byId = getHardcodedClearKey("7a52341c-471f-4274-928b-61d27f150e68");
+      expect(byId?.kid).toBe("c31df1600afc33799ecac543331803f2");
+      expect(byId?.key).toBe("dd2101530e222f545997d4c553787f85");
+
+      const byName = getHardcodedClearKey("Azam Sport 1");
+      expect(byName?.kid).toBe("c31df1600afc33799ecac543331803f2");
+      expect(byName?.key).toBe("dd2101530e222f545997d4c553787f85");
+    });
+
+    it("should return valid keys for Sinema Zetu and UTV", () => {
+      const sinema = getHardcodedClearKey("Sinema Zetu");
+      expect(sinema?.kid).toBe("d628ae37a8f0336b970f250d9699461e");
+      expect(sinema?.key).toBe("1194c3d60bb494aabe9114ca46c2738e");
+
+      const utv = getHardcodedClearKey("UTV");
+      expect(utv?.kid).toBe("31b8fc6289fe3ca698588a59d845160c");
+      expect(utv?.key).toBe("f8c4e73f419cb80db3bdf4a974e31894");
+    });
+
+    it("should return null for unknown channel id", () => {
+      expect(getHardcodedClearKey("unknown-channel-id-xyz")).toBeNull();
     });
   });
 

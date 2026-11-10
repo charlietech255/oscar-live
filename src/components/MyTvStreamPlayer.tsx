@@ -2,17 +2,23 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Volume2, VolumeX, Maximize, RefreshCw, ShieldCheck, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { loadShakaPlayer } from "@/lib/shaka-loader";
-import { detectStreamType, extractClearKey, type MyTvStreamResponse } from "@/lib/mytv-api";
+import {
+  detectStreamType,
+  extractClearKey,
+  getHardcodedClearKey,
+  type MyTvStreamResponse,
+} from "@/lib/mytv-api";
 
 export interface MyTvStreamPlayerProps {
   src: string;
   streamType?: "dash" | "hls" | "direct" | string;
+  channelId?: string;
+  channelName?: string;
   kid?: string;
   key?: string;
   clearKey?: string;
   licenseUrl?: string;
   streamDetails?: MyTvStreamResponse | null;
-  channelName?: string;
   poster?: string;
   autoPlay?: boolean;
   showDebugBadge?: boolean;
@@ -23,12 +29,13 @@ export interface MyTvStreamPlayerProps {
 export function MyTvStreamPlayer({
   src,
   streamType,
+  channelId,
+  channelName,
   kid: propKid,
   key: propKey,
   clearKey,
   licenseUrl,
   streamDetails,
-  channelName,
   poster,
   autoPlay = true,
   showDebugBadge = false,
@@ -45,10 +52,13 @@ export function MyTvStreamPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeKid, setActiveKid] = useState<string | null>(null);
 
-  // Extract ClearKey DRM credentials from props or streamDetails
+  // Extract ClearKey DRM credentials from hardcoded catalog, props, or streamDetails
+  const hardcoded =
+    (channelId ? getHardcodedClearKey(channelId) : null) ||
+    (channelName ? getHardcodedClearKey(channelName) : null);
   const drm = streamDetails ? extractClearKey(streamDetails) : null;
-  const effectiveKid = propKid || drm?.kid;
-  const effectiveKey = clearKey || propKey || drm?.key;
+  const effectiveKid = propKid || drm?.kid || hardcoded?.kid;
+  const effectiveKey = clearKey || propKey || drm?.key || hardcoded?.key;
 
   // Resolve stream type: DASH vs HLS vs Direct
   const resolvedType = detectStreamType(src, streamType || streamDetails?.type || streamDetails?.stream_type);
@@ -87,6 +97,25 @@ export function MyTvStreamPlayer({
 
     setActiveKid(effectiveKid ? effectiveKid.slice(0, 8) + "…" : null);
 
+    // Decode JWT ticket if src is still an unredirected playback.php URL
+    let effectiveSrc = src;
+    if (effectiveSrc && effectiveSrc.includes("playback.php?ticket=")) {
+      try {
+        const ticketParam = effectiveSrc.split("ticket=")[1]?.split("&")[0];
+        if (ticketParam) {
+          const payloadPart = ticketParam.split(".")[0];
+          const padded = payloadPart + "=".repeat((4 - (payloadPart.length % 4)) % 4);
+          const decodedJson = atob(padded.replace(/-/g, "+").replace(/_/g, "/"));
+          const parsed = JSON.parse(decodedJson);
+          if (parsed.url) {
+            effectiveSrc = parsed.url;
+          }
+        }
+      } catch {
+        // Fallback to original src
+      }
+    }
+
     // -------------------------------------------------------------
     // Requirement 3: MPEG-DASH playback via Shaka Player with ClearKey DRM
     // Requirement 5: Buffering goal configured to 20 seconds
@@ -112,6 +141,16 @@ export function MyTvStreamPlayer({
           if (destroyed) {
             await player.destroy();
             return;
+          }
+
+          // Network filter to ensure CORS header resilience
+          const netEngine = player.getNetworkingEngine?.();
+          if (netEngine && netEngine.registerResponseFilter) {
+            netEngine.registerResponseFilter((_type: any, response: any) => {
+              if (response?.headers) {
+                response.headers["access-control-allow-origin"] = "*";
+              }
+            });
           }
 
           // Build W3C ClearKey DRM configuration
@@ -162,7 +201,7 @@ export function MyTvStreamPlayer({
           });
 
           // Load MPEG-DASH manifest
-          await player.load(src);
+          await player.load(effectiveSrc);
           if (!destroyed && autoPlay) {
             tryPlay(video);
           }
@@ -203,7 +242,7 @@ export function MyTvStreamPlayer({
             });
             hlsInstance = hls;
 
-            hls.loadSource(src);
+            hls.loadSource(effectiveSrc);
             hls.attachMedia(video);
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -236,7 +275,7 @@ export function MyTvStreamPlayer({
           } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
             // Safari iOS/macOS native HLS fallback
             setActiveEngine("native");
-            video.src = src;
+            video.src = effectiveSrc;
             video.onerror = () => {
               setError("Hitilafu ya mtiririko wa asili.");
               onError?.("Native HLS playback error");
@@ -260,7 +299,7 @@ export function MyTvStreamPlayer({
     // Direct MP4 / WebM video
     else {
       setActiveEngine("native");
-      video.src = src;
+      video.src = effectiveSrc;
       video.loop = true;
       video.onerror = () => {
         setError("Hitilafu ya kucheza video ya moja kwa moja.");

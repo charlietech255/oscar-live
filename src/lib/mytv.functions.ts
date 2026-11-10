@@ -4,6 +4,8 @@ import {
   MYTV_DEFAULT_API_BASE,
   DEMO_FALLBACK_CATALOG,
   DEMO_FALLBACK_STREAMS,
+  HARDCODED_CLEARKEYS,
+  getHardcodedClearKey,
   type MyTvChannel,
   type MyTvStreamResponse,
 } from "./mytv-api";
@@ -147,7 +149,7 @@ export const fetchMyTvStreamServerFn = createServerFn({ method: "POST" })
           streamData?.error ||
           `HTTP ${res.status}: Imeshindikana kupata mkondo wa chaneli.`;
 
-        // If the real API rejected, provide demo DASH playback so the user can test
+        // If the real API rejected, provide fallback
         const fallback = DEMO_FALLBACK_STREAMS["demo-dash-clearkey"];
         return {
           ...fallback,
@@ -156,7 +158,56 @@ export const fetchMyTvStreamServerFn = createServerFn({ method: "POST" })
         };
       }
 
-      return streamData;
+      const stream = streamData.stream || streamData;
+      let playbackUrl = stream.playback_url || stream.url || stream.stream_url;
+
+      // Follow 302 redirect on server to eliminate CORS redirect and duplicate header issues
+      if (playbackUrl && playbackUrl.includes("playback.php")) {
+        try {
+          const redirectRes = await fetch(playbackUrl, {
+            redirect: "manual",
+            headers: {
+              "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+              Origin: AUTHORIZED_ORIGIN,
+            },
+          });
+          const location = redirectRes.headers.get("location");
+          if (location) {
+            playbackUrl = location.startsWith("http")
+              ? location
+              : new URL(location, playbackUrl).toString();
+          } else if (playbackUrl.includes("ticket=")) {
+            // Fallback: decode JWT ticket directly if location header was obscured
+            const ticket = playbackUrl.split("ticket=")[1]?.split("&")[0];
+            if (ticket) {
+              const payloadPart = ticket.split(".")[0];
+              const padded = payloadPart + "=".repeat((4 - (payloadPart.length % 4)) % 4);
+              const decodedStr = Buffer.from(padded, "base64").toString("utf-8");
+              const decoded = JSON.parse(decodedStr);
+              if (decoded.url) {
+                playbackUrl = decoded.url;
+              }
+            }
+          }
+        } catch (redirectErr) {
+          console.warn("Server redirect resolution warning:", redirectErr);
+        }
+      }
+
+      // Hardcode / inject verified ClearKey DRM keys for this channel
+      const hardcodedKey = getHardcodedClearKey(data.id);
+      const clearKey = hardcodedKey || stream.clearkey || stream.clearKey;
+
+      return {
+        ...streamData,
+        stream: {
+          ...stream,
+          playback_url: playbackUrl,
+          url: playbackUrl,
+          clearkey: clearKey,
+          clearKey: clearKey,
+        },
+      };
     } catch (err: any) {
       const fallback = DEMO_FALLBACK_STREAMS["demo-dash-clearkey"];
       return {
